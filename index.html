@@ -305,6 +305,37 @@
             text-align: center;
         }
 
+        /* Sincronizador */
+        .sync-info {
+            font-size: 12px;
+            color: #718096;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #cbd5e0;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .sync-dot.syncing {
+            background-color: var(--warning);
+            animation: pulse 1s infinite alternate;
+        }
+        
+        .sync-dot.success {
+            background-color: var(--success);
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
+        }
+
         /* Tabela Histórico */
         .history-filters {
             display: grid;
@@ -339,20 +370,6 @@
             background-color: #f7fafc;
             font-weight: bold;
         }
-
-        .btn-delete {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .btn-delete:hover {
-            background: #e53e3e;
-        }
     </style>
 </head>
 <body>
@@ -363,9 +380,15 @@
         <p>Acompanhamento e Registro de Desempenho Diário</p>
     </header>
 
-    <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('registro')">Registrar Produção</button>
-        <button class="tab-btn" onclick="switchTab('historico')">Acompanhar Histórico de Dias</button>
+    <div class="nav-tabs" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 10px;">
+            <button class="tab-btn active" onclick="switchTab('registro')">Registrar Produção</button>
+            <button class="tab-btn" onclick="switchTab('historico')">Acompanhar Histórico de Dias</button>
+        </div>
+        <div class="sync-info">
+            <span id="sync-indicator" class="sync-dot"></span>
+            <span id="sync-text">Carregando dados da Planilha...</span>
+        </div>
     </div>
 
     <!-- ABA 1: REGISTRO E STATUS DIÁRIO -->
@@ -425,7 +448,7 @@
     <!-- ABA 2: HISTÓRICO COMPLETO -->
     <div id="tab-historico" class="tab-content">
         <div class="card">
-            <div class="card-title">Histórico de Produção Registrada</div>
+            <div class="card-title">Histórico de Produção Registrada (Drive)</div>
             
             <div class="history-filters">
                 <div class="form-group" style="margin:0;">
@@ -453,7 +476,6 @@
                             <th>Colaboradora</th>
                             <th>Pontuação Total</th>
                             <th>Status da Meta</th>
-                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="history-table-body">
@@ -466,7 +488,7 @@
 </div>
 
 <script>
-    // URL do Web App do Google Apps Script que você enviou
+    // URL do Web App do Google Apps Script
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyQy0x5F-AU7xosSgaHCKjwqe2-NJy_txRZPrQXvc2g_Qet_EAABGEfq-FLH_H0RvUz/exec";
 
     // Serviços e Pontuação correspondente por unidade feita (sem R$)
@@ -490,8 +512,41 @@
 
     const colaboradoras = ["Brenda", "Leidiane", "Cintia", "Raquel", "Fabiana"];
     
-    // Banco de dados salvo persistentemente no LocalStorage do navegador
-    let historicoProducao = JSON.parse(localStorage.getItem('sos_producao_db')) || [];
+    // O histórico agora será preenchido pelos dados trazidos em tempo real da planilha
+    let historicoProducao = [];
+
+    // Busca dados do Google Drive
+    function carregarDadosDoDrive() {
+        const indicator = document.getElementById('sync-indicator');
+        const text = document.getElementById('sync-text');
+        
+        indicator.className = "sync-dot syncing";
+        text.innerText = "Sincronizando com o Google Drive...";
+
+        fetch(WEB_APP_URL)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    historicoProducao = data;
+                    indicator.className = "sync-dot success";
+                    text.innerText = "Sincronizado em tempo real";
+                    
+                    // Atualiza as telas com os novos dados recebidos
+                    updateDashboard();
+                    renderHistoryTable();
+                }
+            })
+            .catch(err => {
+                console.error("Erro ao puxar dados do Drive:", err);
+                indicator.className = "sync-dot";
+                text.innerText = "Usando dados locais (Modo Offline)";
+                
+                // Fallback para o LocalStorage se a rede falhar
+                historicoProducao = JSON.parse(localStorage.getItem('sos_producao_db')) || [];
+                updateDashboard();
+                renderHistoryTable();
+            });
+    }
 
     // Define a data padrão de hoje nos inputs de data
     function setTodayDate() {
@@ -578,12 +633,11 @@
         calculateTotal();
     }
 
-    // Salva o registro no LocalStorage E no Google Drive
+    // Envia o registro e força atualização do Drive
     function salvarProducao() {
         const collab = document.getElementById('collab-select').value;
         const dataInput = document.getElementById('date-select').value;
         const total = calculateTotal();
-        const meta = parseFloat(document.getElementById('meta-input').value) || 292.00;
         const btnSave = document.getElementById('btn-save');
 
         if (total === 0) {
@@ -591,21 +645,9 @@
             return;
         }
 
-        // Verifica se já existe lançamento para essa colaboradora nesta data localmente
-        const indexExistente = historicoProducao.findIndex(item => item.collab === collab && item.data === dataInput);
-
-        if (indexExistente !== -1) {
-            const confirmar = confirm(`${collab} já possui um registro de ${historicoProducao[indexExistente].pontos.toFixed(2)} pontos no dia ${formatarData(dataInput)}. Deseja somar este novo registro ao existente?`);
-            if (!confirmar) {
-                return;
-            }
-        }
-
-        // Desabilita o botão para evitar cliques duplos durante o salvamento
         btnSave.disabled = true;
         btnSave.innerText = "Enviando ao Drive...";
 
-        // Preparar a lista de quantidade de serviços preenchidos
         let detalhesServicos = {};
         servicos.forEach(servico => {
             const qtd = parseInt(document.getElementById(`input-${servico.id}`).value) || 0;
@@ -614,15 +656,13 @@
             }
         });
 
-        // Monta o pacote de dados para enviar para a planilha do Google Drive
         const payload = {
             colaborador: collab,
-            pecas: total, // Na estrutura do script do Apps Script, vamos enviar a pontuação total calculada
+            pecas: total,
             setor: "Geral",
-            observacoes: JSON.stringify(detalhesServicos) // Salva os detalhes de serviços nas observações como texto formatado
+            observacoes: JSON.stringify(detalhesServicos)
         };
 
-        // Envio assíncrono para o Google Apps Script
         fetch(WEB_APP_URL, {
             method: "POST",
             mode: "no-cors",
@@ -632,54 +672,23 @@
             body: JSON.stringify(payload)
         })
         .then(() => {
-            // Se o envio deu certo (ou enviou sem erros de rede), salvamos localmente também
-            if (indexExistente !== -1) {
-                historicoProducao[indexExistente].pontos += total;
-            } else {
-                historicoProducao.push({
-                    id: Date.now(),
-                    collab: collab,
-                    data: dataInput,
-                    pontos: total,
-                    meta: meta
-                });
-            }
-
-            // Atualiza o armazenamento local
-            localStorage.setItem('sos_producao_db', JSON.stringify(historicoProducao));
-            
-            alert("Sucesso! Produção gravada com sucesso e salva na planilha do Google Drive.");
-            
+            alert("Sucesso! Produção gravada com sucesso.");
             resetForm();
-            updateDashboard();
+            
+            // Recarrega todos os dados do Drive imediatamente após o envio
+            setTimeout(carregarDadosDoDrive, 1500);
         })
         .catch(error => {
-            console.error("Erro ao enviar para o Drive:", error);
-            alert("Atenção: Não foi possível sincronizar com o Google Drive, mas salvamos localmente no navegador por precaução.");
-            
-            // Salvamento de contingência local mesmo se a internet ou o script falhar
-            if (indexExistente !== -1) {
-                historicoProducao[indexExistente].pontos += total;
-            } else {
-                historicoProducao.push({
-                    id: Date.now(),
-                    collab: collab,
-                    data: dataInput,
-                    pontos: total,
-                    meta: meta
-                });
-            }
-            localStorage.setItem('sos_producao_db', JSON.stringify(historicoProducao));
-            updateDashboard();
+            console.error("Erro ao enviar:", error);
+            alert("Erro ao enviar para o Google Drive. Verifique a internet.");
         })
         .finally(() => {
-            // Reativa o botão de salvar
             btnSave.disabled = false;
             btnSave.innerText = "Salvar Registro";
         });
     }
 
-    // Atualiza o painel consolidado do dia selecionado
+    // Atualiza o painel consolidado com base nos dados puxados do Drive
     function updateDashboard() {
         const container = document.getElementById('dashboard-colaboradoras');
         container.innerHTML = '';
@@ -688,10 +697,9 @@
         const meta = parseFloat(document.getElementById('meta-input').value) || 292.00;
 
         colaboradoras.forEach(collab => {
-            // Soma todos os registros dessa colaboradora no dia selecionado
             const total = historicoProducao
                 .filter(item => item.collab === collab && item.data === dataSelecionada)
-                .reduce((soma, item) => soma + item.points || item.pontos, 0); // Correção de segurança para ler "pontos" ou "points"
+                .reduce((soma, item) => soma + item.pontos, 0);
 
             const porcentagem = Math.min((total / meta) * 100, 100);
             
@@ -728,10 +736,11 @@
     function formatarData(dataStr) {
         if (!dataStr) return "";
         const partes = dataStr.split('-');
+        if (partes.length < 3) return dataStr;
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
 
-    // Gera a tabela do histórico com os filtros de colaborador e data
+    // Desenha o histórico com base nos dados vindos da Planilha do Google
     function renderHistoryTable() {
         const tBody = document.getElementById('history-table-body');
         tBody.innerHTML = '';
@@ -739,18 +748,16 @@
         const filterCollab = document.getElementById('filter-collab').value;
         const filterDate = document.getElementById('filter-date').value;
 
-        // Filtra os dados
         const dadosFiltrados = historicoProducao.filter(item => {
             const matchesCollab = filterCollab === 'todos' || item.collab === filterCollab;
             const matchesDate = !filterDate || item.data === filterDate;
             return matchesCollab && matchesDate;
         });
 
-        // Ordena por data decrescente (mais recente primeiro)
         dadosFiltrados.sort((a,b) => b.data.localeCompare(a.data));
 
         if (dadosFiltrados.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #718096;">Nenhum registro encontrado para os filtros selecionados.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #718096;">Nenhum registro encontrado no Google Drive.</td></tr>`;
             return;
         }
 
@@ -771,20 +778,9 @@
                 <td><strong>${item.collab}</strong></td>
                 <td>${item.pontos.toFixed(2)} pts</td>
                 <td>${badge}</td>
-                <td><button class="btn-delete" onclick="deletarRegistro(${item.id})">Excluir</button></td>
             `;
             tBody.appendChild(tr);
         });
-    }
-
-    // Deleta um registro específico do histórico local
-    function deletarRegistro(id) {
-        if (confirm("Tem certeza que deseja excluir permanentemente este registro de produção? (Isso apagará apenas a visualização local do seu navegador)")) {
-            historicoProducao = historicoProducao.filter(item => item.id !== id);
-            localStorage.setItem('sos_producao_db', JSON.stringify(historicoProducao));
-            renderHistoryTable();
-            updateDashboard();
-        }
     }
 
     // Inicialização da página
@@ -792,9 +788,13 @@
         setTodayDate();
         renderServices();
         calculateTotal();
-        updateDashboard();
+        
+        // Puxa as informações oficiais diretamente do seu Google Drive
+        carregarDadosDoDrive();
 
-        // Evento para atualizar o desempenho de acordo com a data selecionada no formulário
+        // Recarrega automaticamente a cada 60 segundos para manter todo mundo atualizado
+        setInterval(carregarDadosDoDrive, 60000);
+
         document.getElementById('date-select').addEventListener('change', updateDashboard);
     };
 </script>
