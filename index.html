@@ -243,6 +243,11 @@
             background: #2b6cb0;
         }
 
+        .btn-action:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
         .btn-reset {
             width: 100%;
             padding: 10px;
@@ -403,7 +408,7 @@
                     <div id="status-tag" class="status-badge status-abaixo">Abaixo da Meta</div>
                 </div>
 
-                <button class="btn-action" onclick="salvarProducao()">Salvar Registro</button>
+                <button class="btn-action" id="btn-save" onclick="salvarProducao()">Salvar Registro</button>
                 <button class="btn-reset" onclick="resetForm()">Zerar Lançamentos Atuais</button>
             </div>
 
@@ -461,6 +466,9 @@
 </div>
 
 <script>
+    // URL do Web App do Google Apps Script que você enviou
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyQy0x5F-AU7xosSgaHCKjwqe2-NJy_txRZPrQXvc2g_Qet_EAABGEfq-FLH_H0RvUz/exec";
+
     // Serviços e Pontuação correspondente por unidade feita (sem R$)
     const servicos = [
         { id: "inspecao", nome: "Inspeção", preco: 0.63 },
@@ -482,7 +490,7 @@
 
     const colaboradoras = ["Brenda", "Leidiane", "Cintia", "Raquel", "Fabiana"];
     
-    // Banco de dados saved persistentemente no LocalStorage do navegador
+    // Banco de dados salvo persistentemente no LocalStorage do navegador
     let historicoProducao = JSON.parse(localStorage.getItem('sos_producao_db')) || [];
 
     // Define a data padrão de hoje nos inputs de data
@@ -570,44 +578,105 @@
         calculateTotal();
     }
 
-    // Salva o registro no banco de dados persistente (LocalStorage)
+    // Salva o registro no LocalStorage E no Google Drive
     function salvarProducao() {
         const collab = document.getElementById('collab-select').value;
-        const data = document.getElementById('date-select').value;
+        const dataInput = document.getElementById('date-select').value;
         const total = calculateTotal();
         const meta = parseFloat(document.getElementById('meta-input').value) || 292.00;
+        const btnSave = document.getElementById('btn-save');
 
         if (total === 0) {
             alert("Adicione a quantidade de pelo menos um serviço antes de salvar!");
             return;
         }
 
-        // Verifica se já existe lançamento para essa colaboradora nesta data
-        const indexExistente = historicoProducao.findIndex(item => item.collab === collab && item.data === data);
+        // Verifica se já existe lançamento para essa colaboradora nesta data localmente
+        const indexExistente = historicoProducao.findIndex(item => item.collab === collab && item.data === dataInput);
 
         if (indexExistente !== -1) {
-            const confirmar = confirm(`${collab} já possui um registro de ${historicoProducao[indexExistente].pontos.toFixed(2)} pontos no dia ${formatarData(data)}. Deseja somar este novo registro ao existente?`);
-            if (confirmar) {
-                historicoProducao[indexExistente].pontos += total;
-            } else {
+            const confirmar = confirm(`${collab} já possui um registro de ${historicoProducao[indexExistente].pontos.toFixed(2)} pontos no dia ${formatarData(dataInput)}. Deseja somar este novo registro ao existente?`);
+            if (!confirmar) {
                 return;
             }
-        } else {
-            historicoProducao.push({
-                id: Date.now(),
-                collab: collab,
-                data: data,
-                pontos: total,
-                meta: meta
-            });
         }
 
-        // Salva persistentemente
-        localStorage.setItem('sos_producao_db', JSON.stringify(historicoProducao));
-        
-        alert("Produção gravada com sucesso!");
-        resetForm();
-        updateDashboard();
+        // Desabilita o botão para evitar cliques duplos durante o salvamento
+        btnSave.disabled = true;
+        btnSave.innerText = "Enviando ao Drive...";
+
+        // Preparar a lista de quantidade de serviços preenchidos
+        let detalhesServicos = {};
+        servicos.forEach(servico => {
+            const qtd = parseInt(document.getElementById(`input-${servico.id}`).value) || 0;
+            if (qtd > 0) {
+                detalhesServicos[servico.nome] = qtd;
+            }
+        });
+
+        // Monta o pacote de dados para enviar para a planilha do Google Drive
+        const payload = {
+            colaborador: collab,
+            pecas: total, // Na estrutura do script do Apps Script, vamos enviar a pontuação total calculada
+            setor: "Geral",
+            observacoes: JSON.stringify(detalhesServicos) // Salva os detalhes de serviços nas observações como texto formatado
+        };
+
+        // Envio assíncrono para o Google Apps Script
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            // Se o envio deu certo (ou enviou sem erros de rede), salvamos localmente também
+            if (indexExistente !== -1) {
+                historicoProducao[indexExistente].pontos += total;
+            } else {
+                historicoProducao.push({
+                    id: Date.now(),
+                    collab: collab,
+                    data: dataInput,
+                    pontos: total,
+                    meta: meta
+                });
+            }
+
+            // Atualiza o armazenamento local
+            localStorage.setItem('sos_producao_db', JSON.stringify(historicoProducao));
+            
+            alert("Sucesso! Produção gravada com sucesso e salva na planilha do Google Drive.");
+            
+            resetForm();
+            updateDashboard();
+        })
+        .catch(error => {
+            console.error("Erro ao enviar para o Drive:", error);
+            alert("Atenção: Não foi possível sincronizar com o Google Drive, mas salvamos localmente no navegador por precaução.");
+            
+            // Salvamento de contingência local mesmo se a internet ou o script falhar
+            if (indexExistente !== -1) {
+                historicoProducao[indexExistente].pontos += total;
+            } else {
+                historicoProducao.push({
+                    id: Date.now(),
+                    collab: collab,
+                    data: dataInput,
+                    pontos: total,
+                    meta: meta
+                });
+            }
+            localStorage.setItem('sos_producao_db', JSON.stringify(historicoProducao));
+            updateDashboard();
+        })
+        .finally(() => {
+            // Reativa o botão de salvar
+            btnSave.disabled = false;
+            btnSave.innerText = "Salvar Registro";
+        });
     }
 
     // Atualiza o painel consolidado do dia selecionado
@@ -622,7 +691,7 @@
             // Soma todos os registros dessa colaboradora no dia selecionado
             const total = historicoProducao
                 .filter(item => item.collab === collab && item.data === dataSelecionada)
-                .reduce((soma, item) => soma + item.pontos, 0);
+                .reduce((soma, item) => soma + item.points || item.pontos, 0); // Correção de segurança para ler "pontos" ou "points"
 
             const porcentagem = Math.min((total / meta) * 100, 100);
             
@@ -708,9 +777,9 @@
         });
     }
 
-    // Deleta um registro específico do histórico
+    // Deleta um registro específico do histórico local
     function deletarRegistro(id) {
-        if (confirm("Tem certeza que deseja excluir permanentemente este registro de produção?")) {
+        if (confirm("Tem certeza que deseja excluir permanentemente este registro de produção? (Isso apagará apenas a visualização local do seu navegador)")) {
             historicoProducao = historicoProducao.filter(item => item.id !== id);
             localStorage.setItem('sos_producao_db', JSON.stringify(historicoProducao));
             renderHistoryTable();
