@@ -382,7 +382,7 @@
 
     <div class="nav-tabs" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <div style="display: flex; gap: 10px;">
-            <button class="tab-btn active" onclick="switchTab('registro')">Registrar Produção</button>
+            <button class="tab-btn active" onclick="switchTab('registro')">Registrar Production</button>
             <button class="tab-btn" onclick="switchTab('historico')">Acompanhar Histórico de Dias</button>
         </div>
         <div class="sync-info">
@@ -512,10 +512,10 @@
 
     const colaboradoras = ["Brenda", "Leidiane", "Cintia", "Raquel", "Fabiana"];
     
-    // O histórico agora será preenchido pelos dados trazidos em tempo real da planilha
+    // Lista contendo os dados carregados em tempo real da planilha
     let historicoProducao = [];
 
-    // Busca dados do Google Drive
+    // Busca dados do Google Drive contornando qualquer restrição de segurança CORS usando JSONP
     function carregarDadosDoDrive() {
         const indicator = document.getElementById('sync-indicator');
         const text = document.getElementById('sync-text');
@@ -523,29 +523,36 @@
         indicator.className = "sync-dot syncing";
         text.innerText = "Sincronizando com o Google Drive...";
 
-        fetch(WEB_APP_URL)
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    historicoProducao = data;
-                    indicator.className = "sync-dot success";
-                    text.innerText = "Sincronizado em tempo real";
-                    
-                    // Atualiza as telas com os novos dados recebidos
-                    updateDashboard();
-                    renderHistoryTable();
-                }
-            })
-            .catch(err => {
-                console.error("Erro ao puxar dados do Drive:", err);
-                indicator.className = "sync-dot";
-                text.innerText = "Usando dados locais (Modo Offline)";
+        // Criamos um elemento de script temporário para ler os dados sem bloqueio CORS do navegador
+        const callbackName = 'callback_' + Math.round(100000 * Math.random());
+        window[callbackName] = function(data) {
+            if (Array.isArray(data)) {
+                historicoProducao = data;
+                indicator.className = "sync-dot success";
+                text.innerText = "Sincronizado em tempo real";
                 
-                // Fallback para o LocalStorage se a rede falhar
-                historicoProducao = JSON.parse(localStorage.getItem('sos_producao_db')) || [];
+                // Atualiza as interfaces visuais
                 updateDashboard();
                 renderHistoryTable();
-            });
+            }
+            // Remove o elemento temporário de script após o carregamento
+            document.body.removeChild(script);
+            delete window[callbackName];
+        };
+
+        const script = document.createElement('script');
+        script.src = WEB_APP_URL + (WEB_APP_URL.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+        script.onerror = function() {
+            console.error("Erro no carregamento JSONP do Drive");
+            indicator.className = "sync-dot";
+            text.innerText = "Usando dados locais (Offline)";
+            
+            // Fallback em caso de falha de conexão física
+            historicoProducao = JSON.parse(localStorage.getItem('sos_producao_db')) || [];
+            updateDashboard();
+            renderHistoryTable();
+        };
+        document.body.appendChild(script);
     }
 
     // Define a data padrão de hoje nos inputs de data
@@ -676,7 +683,7 @@
             resetForm();
             
             // Recarrega todos os dados do Drive imediatamente após o envio
-            setTimeout(carregarDadosDoDrive, 1500);
+            setTimeout(carregarDadosDoDrive, 2000);
         })
         .catch(error => {
             console.error("Erro ao enviar:", error);
