@@ -372,7 +372,7 @@
                     <span>Lançar Produção</span>
                     <div class="meta-container">
                         <label style="margin: 0;">Meta Diária (pts):</label>
-                        <input type="number" id="meta-input" value="120.00" step="10" oninput="calculateTotal()">
+                        <input type="number" id="meta-input" value="292.00" step="10" oninput="calculateTotal()">
                     </div>
                 </div>
 
@@ -461,7 +461,7 @@
 </div>
 
 <script>
-    // Serviços e Pontuação correspondente por unidade feita
+    // Serviços e Pontuação correspondente por unidade feita (sem R$)
     const servicos = [
         { id: "inspecao", nome: "Inspeção", preco: 0.63 },
         { id: "fotografia", nome: "Fotografia", preco: 1.70 },
@@ -482,7 +482,7 @@
 
     const colaboradoras = ["Brenda", "Leidiane", "Cintia", "Raquel", "Fabiana"];
     
-    // Banco de dados salvo persistentemente no LocalStorage do navegador
+    // Banco de dados saved persistentemente no LocalStorage do navegador
     let historicoProducao = JSON.parse(localStorage.getItem('sos_producao_db')) || [];
 
     // Define a data padrão de hoje nos inputs de data
@@ -545,7 +545,7 @@
 
         document.getElementById('live-total').innerText = `${total.toFixed(2)} pts`;
         
-        const meta = parseFloat(document.getElementById('meta-input').value) || 120.00;
+        const meta = parseFloat(document.getElementById('meta-input').value) || 292.00;
         const statusTag = document.getElementById('status-tag');
 
         if (total >= meta) {
@@ -575,7 +575,7 @@
         const collab = document.getElementById('collab-select').value;
         const data = document.getElementById('date-select').value;
         const total = calculateTotal();
-        const meta = parseFloat(document.getElementById('meta-input').value) || 120.00;
+        const meta = parseFloat(document.getElementById('meta-input').value) || 292.00;
 
         if (total === 0) {
             alert("Adicione a quantidade de pelo menos um serviço antes de salvar!");
@@ -616,7 +616,7 @@
         container.innerHTML = '';
 
         const dataSelecionada = document.getElementById('date-select').value;
-        const meta = parseFloat(document.getElementById('meta-input').value) || 120.00;
+        const meta = parseFloat(document.getElementById('meta-input').value) || 292.00;
 
         colaboradoras.forEach(collab => {
             // Soma todos os registros dessa colaboradora no dia selecionado
