@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.O.S - Gestão de Production e Pontuação</title>
+    <title>S.O.S - Gestão de Produção e Pontuação</title>
     <style>
         :root {
             --primary: #2b6cb0;
@@ -478,7 +478,7 @@
         </div>
     </div>
 
-    <!-- ABA 3: FECHAMENTO MENSAL (NOVA ABA PEDIDA!) -->
+    <!-- ABA 3: FECHAMENTO MENSAL -->
     <div id="tab-fechamento" class="tab-content">
         <div class="card">
             <div class="card-title">Fechamento Mensal Integrado (Soma da Pontuação Diária)</div>
@@ -571,7 +571,7 @@
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
         document.getElementById('btn-tab-' + tabName).classList.add('active');
-        document.getElementById('tab-get-' + tabName || 'tab-' + tabName).classList.add('active');
+        document.getElementById('tab-' + tabName).classList.add('active');
         
         if (tabName === 'registro') updateDashboard();
         if (tabName === 'historico') renderHistoryTable();
@@ -636,7 +636,7 @@
         let detalhes = {};
         servicos.forEach(s => {
             let q = parseInt(document.getElementById(`input-${s.id}`).value) || 0;
-            if(q > 0) detalhes[s.name || s.nome] = q;
+            if(q > 0) detalhes[s.nome] = q;
         });
 
         const payload = {
@@ -672,7 +672,6 @@
         const meta = parseFloat(document.getElementById('meta-input').value) || 292.00;
 
         colaboradoras.forEach(collab => {
-            // No painel do dia, nós agrupamos a produção para dar a nota unificada
             const total = historicoProducao
                 .filter(item => item.collab === collab && item.data === dataSel)
                 .reduce((soma, item) => soma + item.pontos, 0);
@@ -694,7 +693,6 @@
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
 
-    // Tabela 2: Lançamentos separados com LOTE
     function renderHistoryTable() {
         const tBody = document.getElementById('history-table-body');
         tBody.innerHTML = '';
@@ -723,18 +721,15 @@
         });
     }
 
-    // Tabela 3: FECHAMENTO MENSAL INTEGRADO (Soma por data)
     function renderFechamentoTable() {
         const tBody = document.getElementById('fechamento-table-body');
         tBody.innerHTML = '';
-        const fMonth = document.getElementById('filter-month').value; // Formato "AAAA-MM"
+        const fMonth = document.getElementById('filter-month').value;
 
         if (!fMonth) return;
 
-        // Filtrar registros do mês selecionado
         const registrosDoMes = historicoProducao.filter(item => item.data.startsWith(fMonth));
 
-        // Agrupar matematicamente por Chave Única: "Data_Colaboradora"
         let mapaAgrupado = {};
         registrosDoMes.forEach(item => {
             const chave = item.data + "_" + item.collab;
@@ -749,7 +744,6 @@
             mapaAgrupado[chave].pontosTotal += item.pontos;
         });
 
-        // Converte o mapa em lista e ordena pela data mais recente
         const listaFechamento = Object.values(mapaAgrupado);
         listaFechamento.sort((a,b) => b.data.localeCompare(a.data));
 
