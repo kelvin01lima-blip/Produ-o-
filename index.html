@@ -416,7 +416,7 @@
 
                 <div class="form-group">
                     <label for="date-select">Data do Trabalho</label>
-                    <input type="date" id="date-select">
+                    <input type="date" id="date-select" onchange="updateDashboard()">
                 </div>
 
                 <label style="margin-bottom: 10px; display: block;">Serviços Realizados</label>
@@ -665,6 +665,7 @@
         });
     }
 
+    // ATUALIZADA: AGORA AS BARRAS SOMAM TODA A PRODUÇÃO DIÁRIA EM TEMPO REAL!
     function updateDashboard() {
         const container = document.getElementById('dashboard-colaboradoras');
         container.innerHTML = '';
@@ -672,17 +673,28 @@
         const meta = parseFloat(document.getElementById('meta-input').value) || 292.00;
 
         colaboradoras.forEach(collab => {
+            // Soma todos os lotes que essa colaboradora enviou nesta data específica
             const total = historicoProducao
                 .filter(item => item.collab === collab && item.data === dataSel)
                 .reduce((soma, item) => soma + item.pontos, 0);
 
-            const porcentagem = Math.min((total / meta) * 100, 100);
-            let cor = total >= meta ? '#48bb78' : (total >= meta*0.9 ? '#ecc94b' : '#f56565');
+            const porcentagem = Math.round((total / meta) * 100);
+            let cor = total >= meta ? '#48bb78' : (total >= meta * 0.9 ? '#ecc94b' : '#f56565');
+            let textoStatus = total >= meta ? 'Meta Batida! 🔥' : (total >= meta * 0.9 ? 'Quase lá 🎯' : 'Abaixo da Meta 📉');
 
+            // Criamos a estrutura lateral com nome, pontos acumulados, a barra visual e a porcentagem real (mesmo que passe de 100%)
             container.innerHTML += `
                 <div class="collaborator-status-card">
-                    <div class="collab-header"><strong>${collab}</strong> <span>${total.toFixed(2)} / ${meta.toFixed(2)} pts</span></div>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${porcentagem}%; background-color: ${cor};"></div></div>
+                    <div class="collab-header">
+                        <strong>${collab}</strong> 
+                        <span>${total.toFixed(2)} / ${meta.toFixed(2)} pts</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${Math.min(porcentagem, 100)}%; background-color: ${cor};"></div>
+                    </div>
+                    <div style="font-size: 12px; text-align: right; font-weight: bold; color: ${cor}; margin-top: 4px;">
+                        ${textoStatus} (${porcentagem}%)
+                    </div>
                 </div>`;
         });
     }
@@ -777,7 +789,6 @@
         renderServices();
         carregarDadosDoDrive();
         setInterval(carregarDadosDoDrive, 60000);
-        document.getElementById('date-select').addEventListener('change', updateDashboard);
     };
 </script>
 
