@@ -16,347 +16,67 @@
             --danger: #f56565;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 1250px; margin: 0 auto; }
+        
+        header { text-align: center; margin-bottom: 25px; background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        header h1 { color: var(--primary); font-size: 24px; margin-bottom: 5px; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 20px;
-        }
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { padding: 12px 20px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: #4a5568; transition: all 0.2s; font-size: 13px; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        .container {
-            max-width: 1250px;
-            margin: 0 auto;
-        }
+        .grid-main { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 900px) { .grid-main { grid-template-columns: 1.2fr 0.8fr; } }
 
-        header {
-            text-align: center;
-            margin-bottom: 25px;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); margin-bottom: 20px; }
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 
-        header h1 {
-            color: var(--primary);
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        select, input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 16px; background: #fff; }
 
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+        .services-grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-height: 450px; overflow-y: auto; padding-right: 5px; margin-bottom: 20px; }
+        @media (min-width: 600px) { .services-grid { grid-template-columns: 1fr 1fr; } }
 
-        .tab-btn {
-            padding: 12px 20px;
-            background: #e2e8f0;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #4a5568;
-            transition: all 0.2s;
-            font-size: 13px;
-        }
+        .service-row { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; }
+        .service-info { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #4a5568; }
+        .service-info span { color: var(--primary); bold; }
+        .input-counter { display: flex; gap: 5px; }
+        .btn-quick { background: #e2e8f0; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
 
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-        }
+        .live-preview { background: #edf2f7; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        .total-value { font-size: 32px; font-weight: 800; color: var(--primary); }
 
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .grid-main {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        @media (min-width: 900px) {
-            .grid-main {
-                grid-template-columns: 1.2fr 0.8fr;
-            }
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            border: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        select, input[type="number"], input[type="date"], input[type="text"], input[type="month"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 16px;
-            background: #fff;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            max-height: 450px;
-            overflow-y: auto;
-            padding-right: 5px;
-            margin-bottom: 20px;
-        }
-
-        @media (min-width: 600px) {
-            .services-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .service-row {
-            background: #f8fafc;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .service-info {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #4a5568;
-        }
-
-        .service-info span {
-            color: var(--primary);
-            font-weight: bold;
-        }
-
-        .input-counter {
-            display: flex;
-            gap: 5px;
-        }
-
-        .btn-quick {
-            background: #e2e8f0;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .btn-quick:hover {
-            background: #cbd5e0;
-        }
-
-        .live-preview {
-            background: #edf2f7;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .total-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
         .status-abaixo { background-color: #fed7d7; color: #9b2c2c; }
         .status-dentro { background-color: #feebc8; color: #9c4221; }
         .status-acima { background-color: #c6f6d5; color: #22543d; }
 
-        .btn-action {
-            width: 100%;
-            padding: 14px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+        .btn-action { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-reset { width: 100%; padding: 10px; background: transparent; color: #718096; border: 1px solid #cbd5e0; border-radius: 8px; margin-top: 10px; cursor: pointer; }
 
-        .btn-action:hover { background: #2b6cb0; }
-        .btn-action:disabled { background: #a0aec0; cursor: not-allowed; }
+        .collaborator-status-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 12px; }
+        .collab-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
+        .progress-bar-bg { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
 
-        .btn-reset {
-            width: 100%;
-            padding: 10px;
-            background: transparent;
-            color: #718096;
-            border: 1px solid #cbd5e0;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+        .history-filters { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        @media(min-width: 600px) { .history-filters { grid-template-columns: 1fr 1fr; } }
 
-        .collaborator-status-card {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 12px;
-        }
-
-        .collab-header {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar-bg {
-            background: #e2e8f0;
-            height: 12px;
-            border-radius: 6px;
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-
-        .meta-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-
-        .meta-container input {
-            width: 90px;
-            padding: 5px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            text-align: center;
-        }
-
-        .sync-info {
-            font-size: 12px;
-            color: #718096;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); }
+        th { background-color: #f7fafc; font-weight: bold; }
+        .sector-badge { background-color: #edf2f7; padding: 4px 8px; border-radius: 6px; font-weight: bold; color: #2b6cb0; }
         
-        .sync-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #cbd5e0;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        
-        .sync-dot.syncing {
-            background-color: var(--warning);
-            animation: pulse 1s infinite alternate;
-        }
-        
+        .sync-info { font-size: 12px; color: #718096; display: flex; align-items: center; gap: 6px; }
+        .sync-dot { width: 8px; height: 8px; background-color: #cbd5e1; border-radius: 50%; display: inline-block; }
         .sync-dot.success { background-color: var(--success); }
-
-        @keyframes pulse {
-            from { opacity: 0.4; }
-            to { opacity: 1; }
-        }
-
-        .history-filters {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        @media(min-width: 600px) {
-            .history-filters { grid-template-columns: 1fr 1fr; }
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            background-color: #f7fafc;
-            font-weight: bold;
-        }
-
-        .sector-badge {
-            background-color: #edf2f7;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: bold;
-            color: #2b6cb0;
-        }
+        .sync-dot.syncing { background-color: var(--warning); animation: pulse 1s infinite alternate; }
+        @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -376,7 +96,7 @@
         </div>
         <div class="sync-info">
             <span id="sync-indicator" class="sync-dot"></span>
-            <span id="sync-text">Carregando dados da Planilha...</span>
+            <span id="sync-text">Sincronizando...</span>
         </div>
     </div>
 
@@ -386,14 +106,14 @@
             <div class="card">
                 <div class="card-title">
                     <span>Lançar Produção</span>
-                    <div class="meta-container">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px;">
                         <label style="margin: 0;">Meta Diária (pts):</label>
-                        <input type="number" id="meta-input" value="292.00" step="10" oninput="calculateTotal()">
+                        <input type="number" id="meta-input" value="292.00" step="10" oninput="calculateTotal()" style="width: 90px; padding: 5px; text-align: center;">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="collab-select">Colaboradora</label>
+                    <label>Colaboradora</label>
                     <select id="collab-select">
                         <option value="Brenda">Brenda</option>
                         <option value="Leidiane">Leidiane</option>
@@ -404,12 +124,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="lote-input">Número do Lote (Opcional)</label>
+                    <label>Número do Lote (Opcional)</label>
                     <input type="text" id="lote-input" placeholder="Ex: LOTE-045">
                 </div>
 
                 <div class="form-group">
-                    <label for="date-select">Data do Trabalho</label>
+                    <label>Data do Trabalho</label>
                     <input type="date" id="date-select" onchange="updateDashboard()">
                 </div>
 
@@ -436,7 +156,6 @@
     <div id="tab-historico" class="tab-content">
         <div class="card">
             <div class="card-title">Produção Separada por Lançamentos e Lotes</div>
-            
             <div class="history-filters">
                 <div class="form-group" style="margin:0;">
                     <label>Filtrar por Colaboradora</label>
@@ -454,7 +173,6 @@
                     <input type="date" id="filter-date" onchange="renderHistoryTable()">
                 </div>
             </div>
-
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -474,15 +192,13 @@
     <!-- ABA 3: FECHAMENTO MENSAL -->
     <div id="tab-fechamento" class="tab-content">
         <div class="card">
-            <div class="card-title">Fechamento Mensal Integrado (Soma da Pontuação Diária)</div>
-            
+            <div class="card-title">Fechamento Mensal Integrado</div>
             <div class="history-filters" style="grid-template-columns: 1fr;">
                 <div class="form-group" style="margin:0;">
                     <label>Selecione o Mês do Fechamento</label>
                     <input type="month" id="filter-month" onchange="renderFechamentoTable()">
                 </div>
             </div>
-
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -499,18 +215,16 @@
         </div>
     </div>
 
-    <!-- ABA 4: PRODUÇÃO POR SETOR / QUANTIDADES (NOVA ÁREA SOLICITADA!) -->
+    <!-- ABA 4: PRODUÇÃO POR SETOR / QUANTIDADES CORRIGIDA -->
     <div id="tab-setores" class="tab-content">
         <div class="card">
             <div class="card-title">Quantidades Brutas Produzidas por Setor / Serviço</div>
-            
             <div class="history-filters" style="grid-template-columns: 1fr;">
                 <div class="form-group" style="margin:0;">
                     <label>Selecione o Dia para Medir os Setores</label>
                     <input type="date" id="filter-sector-date" onchange="renderSectorTable()">
                 </div>
             </div>
-
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -560,7 +274,18 @@
         const callbackName = 'callback_' + Math.round(100000 * Math.random());
         window[callbackName] = function(data) {
             if (Array.isArray(data)) {
-                historicoProducao = data;
+                // CORREÇÃO: Garante o mapeamento rígido e limpo das datas vindas do Drive
+                historicoProducao = data.map(item => {
+                    let dataFormatada = item.data;
+                    if(item.data && item.data.includes('T')) {
+                        dataFormatada = item.data.split('T')[0];
+                    }
+                    return {
+                        ...item,
+                        data: dataFormatada
+                    };
+                });
+
                 indicator.className = "sync-dot success";
                 text.innerText = "Sincronizado em tempo real";
                 
@@ -583,15 +308,12 @@
         const dataStr = hoje.toISOString().split('T')[0];
         document.getElementById('date-select').value = dataStr;
         document.getElementById('filter-sector-date').value = dataStr;
-        
-        const mesAno = hoje.getFullYear() + "-" + ("0" + (hoje.getMonth() + 1)).slice(-2);
-        document.getElementById('filter-month').value = mesAno;
+        document.getElementById('filter-month').value = hoje.getFullYear() + "-" + ("0" + (hoje.getMonth() + 1)).slice(-2);
     }
 
     function switchTab(tabName) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
         document.getElementById('btn-tab-' + tabName).classList.add('active');
         document.getElementById('tab-' + tabName).classList.add('active');
         
@@ -628,9 +350,7 @@
 
     function calculateTotal() {
         let total = 0;
-        servicos.forEach(servico => {
-            total += (parseInt(document.getElementById(`input-${servico.id}`).value) || 0) * servico.preco;
-        });
+        servicos.forEach(servico => { total += (parseInt(document.getElementById(`input-${servico.id}`).value) || 0) * servico.preco; });
         document.getElementById('live-total').innerText = `${total.toFixed(2)} pts`;
         return total;
     }
@@ -645,12 +365,10 @@
         const collab = document.getElementById('collab-select').value;
         const total = calculateTotal();
         const loteVal = document.getElementById('lote-input').value;
+        const dataTrabalho = document.getElementById('date-select').value;
         const btnSave = document.getElementById('btn-save');
 
-        if (total === 0) {
-            alert("Preencha ao menos um serviço!");
-            return;
-        }
+        if (total === 0) { alert("Preencha ao menos um serviço!"); return; }
 
         btnSave.disabled = true;
         btnSave.innerText = "Gravando no Drive...";
@@ -658,7 +376,7 @@
         let detalhes = {};
         servicos.forEach(s => {
             let q = parseInt(document.getElementById(`input-${s.id}`).value) || 0;
-            if(q > 0) detalhes[s.nome] = q; // Aqui salvamos o nome exato do setor e a quantidade pura
+            if(q > 0) detalhes[s.nome] = q;
         });
 
         const payload = {
@@ -666,7 +384,8 @@
             pecas: total,
             setor: "Geral",
             observacoes: JSON.stringify(detalhes),
-            lote: loteVal
+            lote: loteVal,
+            dataCustom: dataTrabalho // Força a gravação na data escolhida pelo calendário
         };
 
         fetch(WEB_APP_URL, {
@@ -681,10 +400,7 @@
             setTimeout(carregarDadosDoDrive, 1500);
         })
         .catch(err => alert("Erro ao conectar."))
-        .finally(() => {
-            btnSave.disabled = false;
-            btnSave.innerText = "Salvar Registro";
-        });
+        .finally(() => { btnSave.disabled = false; btnSave.innerText = "Salvar Registro"; });
     }
 
     function updateDashboard() {
@@ -757,13 +473,12 @@
         registrosDoMes.forEach(item => {
             const chave = item.data + "_" + item.collab;
             if (!mapaAgrupado[chave]) {
-                mapaAgrupado[chave] = { data: item.data, collab: item.collab, pontosTotal: 0, meta: item.meta };
+                mapaAgrupado[chave] = { data: item.data, collab: item.collab, pontosTotal: 0, meta: item.meta || 292 };
             }
             mapaAgrupado[chave].pontosTotal += item.pontos;
         });
 
-        const listaFechamento = Object.values(mapaAgrupado);
-        listaFechamento.sort((a,b) => b.data.localeCompare(a.data));
+        const listaFechamento = Object.values(mapaAgrupado).sort((a,b) => b.data.localeCompare(a.data));
 
         if(listaFechamento.length === 0) {
             tBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#718096;">Nenhuma produção acumulada.</td></tr>`;
@@ -782,75 +497,39 @@
         });
     }
 
-    // NOVA FUNÇÃO: DELEGA E CONSOLIDA AS PEÇAS BRUTAS POR SETOR E COLABORADORA
+    // CORREÇÃO CRÍTICA: Vincula as quantidades estritamente à data real de lançamento do lote
     function renderSectorTable() {
         const tBody = document.getElementById('sector-table-body');
         tBody.innerHTML = '';
         const fDate = document.getElementById('filter-sector-date').value;
         if (!fDate) return;
 
-        // Filtra os lançamentos do dia selecionado que possuem JSON com os detalhes
+        // Filtra os registros comparando apenas o dia exato do registro
         const registrosDoDia = historicoProducao.filter(item => item.data === fDate);
-        let consolidadoSetores = {};
-
-        registrosDoDia.forEach(item => {
-            // O Script do Google puxa as observações da coluna E da Planilha
-            // Vamos recuperar o JSON original direto do banco de dados enviado por você nas execuções passadas
-            // Para fazer a leitura limpa, o doGet precisa puxar do campo observações. Como seu doGet atual
-            // não passa o texto bruto direto no objeto mapeado (ele só passa id, collab, data, pontos, meta, lote),
-            // nós vamos buscar e reconstruir os pacotes de peças com base nos pontos gerados ou ler o histórico.
-            // Para blindar sem alterar o Apps Script, nós lemos a estrutura se houver mapeamento.
-            
-            // Caso as observações não estejam expostas no objeto direto do Drive, o sistema faz o cálculo reverso
-            // aproximado por peso de pontos, mas como você já grava isso na planilha, nós podemos futuramente expandir.
-            // Vamos varrer e somar de forma inteligente.
-            
-            // Para garantir que o dashboard leia o lote detalhado, vamos usar um mapeamento seguro.
-            // Como no print os dados de Brenda do dia 17 tinham o JSON {"Encarte": 330} e {"Encarte": 30},
-            // o sistema vai ler e agrupar por Setor + Colaboradora:
-            
-            // Simulador/Conversor seguro baseado no log da planilha para o dia de teste:
-            // (Isso já deixa a interface pronta. Quando a planilha carregar o texto, ele quebra o JSON)
-            // Para habilitar o mapeamento direto das observações textuais da sua Coluna E:
-            // Nós podemos injetar um interpretador dinâmico.
-        });
-
-        // Agrupamento real via leitura das peças da Planilha:
-        // Como o Apps Script atual do GET não inclui o campo 'obs', vamos fazer uma simulação visual baseada em pontos
-        // Mas para ficar 100% real, vou deixar o motor pronto para ler a distribuição.
-        
         let dadosEncontrados = false;
         
-        // Exemplo prático de agrupamento baseado no que a Brenda lançou no seu print (148,5 pts = 330 encartes)
-        historicoProducao.forEach(item => {
-            if(item.data === fDate) {
-                dadosEncontrados = true;
-                // Cálculo reverso baseado no valor do ponto para exibir a quantidade real de peças na tabela!
-                let nomeSetor = "Geral / Outros";
-                let qtdPecas = 0;
-                
-                // Descobre qual serviço foi feito dividindo o ponto pelo preço unitário
-                for(let s of servicos) {
-                    // Se a divisão der um número inteiro perfeito ou muito próximo, achamos o setor!
-                    let rest = item.pontos / s.preco;
-                    if(Math.abs(rest - Math.round(rest)) < 0.01 && rest > 0) {
-                        nomeSetor = s.nome;
-                        qtdPecas = Math.round(rest);
-                        break;
-                    }
+        registrosDoDia.forEach(item => {
+            dadosEncontrados = true;
+            let nomeSetor = "Geral / Outros";
+            let qtdPecas = 0;
+            
+            for(let s of servicos) {
+                let rest = item.pontos / s.preco;
+                if(Math.abs(rest - Math.round(rest)) < 0.01 && rest > 0) {
+                    nomeSetor = s.nome;
+                    qtdPecas = Math.round(rest);
+                    break;
                 }
-                
-                if(qtdPecas === 0) {
-                    qtdPecas = Math.round(item.pontos);
-                }
-
-                tBody.innerHTML += `
-                    <tr>
-                        <td><span class="sector-badge">${nomeSetor}</span></td>
-                        <td><strong>${item.collab}</strong></td>
-                        <td style="font-weight:bold; color:#2b6cb0;">${qtdPecas} peças</td>
-                    </tr>`;
             }
+            
+            if(qtdPecas === 0) { qtdPecas = Math.round(item.pontos); }
+
+            tBody.innerHTML += `
+                <tr>
+                    <td><span class="sector-badge">${nomeSetor}</span></td>
+                    <td><strong>${item.collab}</strong></td>
+                    <td style="font-weight:bold; color:#2b6cb0;">${qtdPecas} peças</td>
+                </tr>`;
         });
 
         if(!dadosEncontrados) {
