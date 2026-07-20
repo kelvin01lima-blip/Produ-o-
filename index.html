@@ -16,333 +16,67 @@
             --danger: #f56565;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 1250px; margin: 0 auto; }
+        
+        header { text-align: center; margin-bottom: 25px; background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        header h1 { color: var(--primary); font-size: 24px; margin-bottom: 5px; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 20px;
-        }
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { padding: 12px 20px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: #4a5568; transition: all 0.2s; font-size: 13px; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        .container {
-            max-width: 1250px;
-            margin: 0 auto;
-        }
+        .grid-main { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 900px) { .grid-main { grid-template-columns: 1.2fr 0.8fr; } }
 
-        header {
-            text-align: center;
-            margin-bottom: 25px;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); margin-bottom: 20px; }
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 
-        header h1 {
-            color: var(--primary);
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        select, input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 16px; background: #fff; }
 
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+        .services-grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-height: 450px; overflow-y: auto; padding-right: 5px; margin-bottom: 20px; }
+        @media (min-width: 600px) { .services-grid { grid-template-columns: 1fr 1fr; } }
 
-        .tab-btn {
-            padding: 12px 20px;
-            background: #e2e8f0;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #4a5568;
-            transition: all 0.2s;
-            font-size: 13px;
-        }
+        .service-row { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; }
+        .service-info { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #4a5568; }
+        .service-info span { color: var(--primary); font-weight: bold; }
+        .input-counter { display: flex; gap: 5px; }
+        .btn-quick { background: #e2e8f0; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
 
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-        }
+        .live-preview { background: #edf2f7; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        .total-value { font-size: 32px; font-weight: 800; color: var(--primary); }
 
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .grid-main {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        @media (min-width: 900px) {
-            .grid-main {
-                grid-template-columns: 1.2fr 0.8fr;
-            }
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            border: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        select, input[type="number"], input[type="date"], input[type="text"], input[type="month"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 16px;
-            background: #fff;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            max-height: 450px;
-            overflow-y: auto;
-            padding-right: 5px;
-            margin-bottom: 20px;
-        }
-
-        @media (min-width: 600px) {
-            .services-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .service-row {
-            background: #f8fafc;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .service-info {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #4a5568;
-        }
-
-        .service-info span {
-            color: var(--primary);
-            font-weight: bold;
-        }
-
-        .input-counter {
-            display: flex;
-            gap: 5px;
-        }
-
-        .btn-quick {
-            background: #e2e8f0;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .btn-quick:hover {
-            background: #cbd5e0;
-        }
-
-        .live-preview {
-            background: #edf2f7;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .total-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
         .status-abaixo { background-color: #fed7d7; color: #9b2c2c; }
         .status-dentro { background-color: #feebc8; color: #9c4221; }
         .status-acima { background-color: #c6f6d5; color: #22543d; }
 
-        .btn-action {
-            width: 100%;
-            padding: 14px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+        .btn-action { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-reset { width: 100%; padding: 10px; background: transparent; color: #718096; border: 1px solid #cbd5e0; border-radius: 8px; margin-top: 10px; cursor: pointer; }
 
-        .btn-action:hover { background: #2b6cb0; }
-        .btn-action:disabled { background: #a0aec0; cursor: not-allowed; }
+        .collaborator-status-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 12px; }
+        .collab-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
+        .progress-bar-bg { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
 
-        .btn-reset {
-            width: 100%;
-            padding: 10px;
-            background: transparent;
-            color: #718096;
-            border: 1px solid #cbd5e0;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+        .history-filters { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border); align-items: flex-end; }
+        @media(min-width: 600px) { .history-filters { grid-template-columns: 1fr 1fr auto; } }
 
-        .collaborator-status-card {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 12px;
-        }
-
-        .collab-header {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar-bg {
-            background: #e2e8f0;
-            height: 12px;
-            border-radius: 6px;
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-
-        .history-filters {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        @media(min-width: 600px) {
-            .history-filters { grid-template-columns: 1fr 1fr; }
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid var(--border);
-            text-align: center;
-        }
-
-        th {
-            background-color: #f7fafc;
-            font-weight: bold;
-        }
-
-        .sector-badge {
-            background-color: #edf2f7;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: bold;
-            color: #2b6cb0;
-        }
-
-        .sync-info {
-            font-size: 12px;
-            color: #718096;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: center; }
+        th { background-color: #f7fafc; font-weight: bold; }
+        .sector-badge { background-color: #edf2f7; padding: 4px 8px; border-radius: 6px; font-weight: bold; color: #2b6cb0; }
         
-        .sync-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #cbd5e1;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        
-        .sync-dot.syncing {
-            background-color: var(--warning);
-            animation: pulse 1s infinite alternate;
-        }
-        
+        .sync-info { font-size: 12px; color: #718096; display: flex; align-items: center; gap: 6px; }
+        .sync-dot { width: 8px; height: 8px; background-color: #cbd5e1; border-radius: 50%; display: inline-block; }
         .sync-dot.success { background-color: var(--success); }
-
-        @keyframes pulse {
-            from { opacity: 0.4; }
-            to { opacity: 1; }
-        }
+        .sync-dot.syncing { background-color: var(--warning); animation: pulse 1s infinite alternate; }
+        @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -362,7 +96,7 @@
         </div>
         <div class="sync-info">
             <span id="sync-indicator" class="sync-dot"></span>
-            <span id="sync-text">Carregando dados...</span>
+            <span id="sync-text">Conectando...</span>
         </div>
     </div>
 
@@ -422,7 +156,6 @@
     <div id="tab-historico" class="tab-content">
         <div class="card">
             <div class="card-title">Produção Separada por Lançamentos e Lotes</div>
-            
             <div class="history-filters">
                 <div class="form-group" style="margin:0;">
                     <label>Filtrar por Colaboradora</label>
@@ -440,7 +173,6 @@
                     <input type="date" id="filter-date" onchange="renderHistoryTable()">
                 </div>
             </div>
-
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -460,15 +192,13 @@
     <!-- ABA 3: FECHAMENTO MENSAL -->
     <div id="tab-fechamento" class="tab-content">
         <div class="card">
-            <div class="card-title">Fechamento Mensal Integrado (Soma da Pontuação Diária)</div>
-            
+            <div class="card-title">Fechamento Mensal Integrado</div>
             <div class="history-filters" style="grid-template-columns: 1fr;">
                 <div class="form-group" style="margin:0;">
                     <label>Selecione o Mês do Fechamento</label>
                     <input type="month" id="filter-month" onchange="renderFechamentoTable()">
                 </div>
             </div>
-
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -489,14 +219,13 @@
     <div id="tab-setores" class="tab-content">
         <div class="card">
             <div class="card-title">Quantidades Brutas Produzidas por Setor / Serviço</div>
-            
-            <div class="history-filters" style="grid-template-columns: 1fr;">
+            <div class="history-filters">
                 <div class="form-group" style="margin:0;">
-                    <label>Selecione o Dia para Medir os Setores</label>
-                    <input type="date" id="filter-sector-date" onchange="renderSectorTable()">
+                    <label>Selecione o Dia para Medir</label>
+                    <input type="date" id="filter-sector-date">
                 </div>
+                <button class="tab-btn active" onclick="renderSectorTable()" style="height: 44px; padding: 0 30px;">Filtrar Data</button>
             </div>
-
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -546,26 +275,19 @@
         const callbackName = 'callback_' + Math.round(100000 * Math.random());
         window[callbackName] = function(data) {
             if (Array.isArray(data)) {
-                // Ajusta e lê as strings de data puras para casar sem erros de fuso horário
                 historicoProducao = data.map(item => {
-                    let dataLimpa = item.data;
-                    if(item.data && item.data.includes('T')) {
-                        dataLimpa = item.data.split('T')[0];
+                    let dStr = item.data || "";
+                    if(dStr.includes('T')) dStr = dStr.split('T')[0];
+                    if(dStr.includes('/')) {
+                        let p = dStr.split(' ')[0].split('/');
+                        dStr = p[2] + "-" + p[1] + "-" + p[0];
                     }
-                    return { ...item, data: dataLimpa };
+                    return { ...item, data: dStr };
                 });
 
                 indicator.className = "sync-dot success";
                 text.innerText = "Sincronizado em tempo real";
                 
-                // Abre o filtro espelhando sempre o último dia em que houve dados reais (ex: dia 17)
-                const inputSector = document.getElementById('filter-sector-date');
-                if ((!inputSector.value || inputSector.value === "") && historicoProducao.length > 0) {
-                    let ordenados = [...historicoProducao].sort((a,b) => b.data.localeCompare(a.data));
-                    inputSector.value = ordenados[0].data;
-                    document.getElementById('date-select').value = ordenados[0].data;
-                }
-
                 updateDashboard();
                 renderHistoryTable();
                 renderFechamentoTable();
@@ -580,17 +302,17 @@
         document.body.appendChild(script);
     }
 
-    function setTodayDate() {
+    function setInitialDates() {
         const hoje = new Date();
         const dataStr = hoje.toISOString().split('T')[0];
         document.getElementById('date-select').value = dataStr;
+        document.getElementById('filter-sector-date').value = "2026-07-17"; // Trava visual padrão no dia com dados reais
         document.getElementById('filter-month').value = hoje.getFullYear() + "-" + ("0" + (hoje.getMonth() + 1)).slice(-2);
     }
 
     function switchTab(tabName) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
         document.getElementById('btn-tab-' + tabName).classList.add('active');
         document.getElementById('tab-' + tabName).classList.add('active');
         
@@ -646,9 +368,8 @@
         const btnSave = document.getElementById('btn-save');
 
         if (total === 0) { alert("Preencha ao menos um serviço!"); return; }
-
         btnSave.disabled = true;
-        btnSave.innerText = "Gravando no Drive...";
+        btnSave.innerText = "Gravando...";
 
         let detalhes = {};
         servicos.forEach(s => {
@@ -672,15 +393,12 @@
             body: JSON.stringify(payload)
         })
         .then(() => {
-            alert("Produção gravada com sucesso!");
+            alert("Produção gravada!");
             resetForm();
             setTimeout(carregarDadosDoDrive, 1500);
         })
         .catch(err => alert("Erro ao conectar."))
-        .finally(() => {
-            btnSave.disabled = false;
-            btnSave.innerText = "Salvar Registro";
-        });
+        .finally(() => { btnSave.disabled = false; btnSave.innerText = "Salvar Registro"; });
     }
 
     function updateDashboard() {
@@ -708,7 +426,7 @@
     }
 
     function formatarData(dataStr) {
-        if (!dataStr) return "";
+        if (!dataStr || !dataStr.includes('-')) return dataStr;
         const partes = dataStr.split('-');
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
@@ -722,11 +440,10 @@
         const filtrados = historicoProducao.filter(item => {
             return (fCollab === 'todos' || item.collab === fCollab) && (!fDate || item.data === fDate);
         });
-
         filtrados.sort((a,b) => b.data.localeCompare(a.data));
 
         if(filtrados.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum lote lançado.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="4">Nenhum lote encontrado.</td></tr>`;
             return;
         }
 
@@ -761,7 +478,7 @@
         const listaFechamento = Object.values(mapaAgrupado).sort((a,b) => b.data.localeCompare(a.data));
 
         if(listaFechamento.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#718096;">Nenhuma produção acumulada.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="4">Nenhuma produção acumulada este mês.</td></tr>`;
             return;
         }
 
@@ -799,7 +516,6 @@
                     break;
                 }
             }
-            
             if(qtdPecas === 0) { qtdPecas = Math.round(item.pontos); }
 
             tBody.innerHTML += `
@@ -811,12 +527,12 @@
         });
 
         if(!dadosEncontrados) {
-            tBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#718096;">Nenhuma quantidade registrada para esta data.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="3">Nenhuma quantidade registrada para esta data. Selecione outro dia.</td></tr>`;
         }
     }
 
     window.onload = function() {
-        setTodayDate();
+        setInitialDates();
         renderServices();
         carregarDadosDoDrive();
         setInterval(carregarDadosDoDrive, 60000);
