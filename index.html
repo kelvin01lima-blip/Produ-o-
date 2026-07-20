@@ -64,8 +64,8 @@
         .progress-bar-bg { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; }
         .progress-bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
 
-        .history-filters { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border); align-items: flex-end; }
-        @media(min-width: 600px) { .history-filters { grid-template-columns: 1fr 1fr auto; } }
+        .history-filters { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        @media(min-width: 600px) { .history-filters { grid-template-columns: 1fr 1fr; } }
 
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: center; }
@@ -96,7 +96,7 @@
         </div>
         <div class="sync-info">
             <span id="sync-indicator" class="sync-dot"></span>
-            <span id="sync-text">Conectando...</span>
+            <span id="sync-text">Carregando dados...</span>
         </div>
     </div>
 
@@ -219,12 +219,11 @@
     <div id="tab-setores" class="tab-content">
         <div class="card">
             <div class="card-title">Quantidades Brutas Produzidas por Setor / Serviço</div>
-            <div class="history-filters">
+            <div class="history-filters" style="grid-template-columns: 1fr;">
                 <div class="form-group" style="margin:0;">
-                    <label>Selecione o Dia para Medir</label>
-                    <input type="date" id="filter-sector-date">
+                    <label>Selecione o Dia para Medir os Setores</label>
+                    <input type="date" id="filter-sector-date" onchange="renderSectorTable()">
                 </div>
-                <button class="tab-btn active" onclick="renderSectorTable()" style="height: 44px; padding: 0 30px;">Filtrar Data</button>
             </div>
             <div style="overflow-x: auto;">
                 <table>
@@ -276,18 +275,39 @@
         window[callbackName] = function(data) {
             if (Array.isArray(data)) {
                 historicoProducao = data.map(item => {
-                    let dStr = item.data || "";
+                    let dStr = item.Data || item.data || "";
                     if(dStr.includes('T')) dStr = dStr.split('T')[0];
                     if(dStr.includes('/')) {
                         let p = dStr.split(' ')[0].split('/');
                         dStr = p[2] + "-" + p[1] + "-" + p[0];
                     }
-                    return { ...item, data: dStr };
+                    // MAPEAMENTO EXATO DA SUA PLANILHA: "Colaborador" e "Peças produzidas"
+                    return {
+                        data: dStr,
+                        collab: item.Colaborador || item.colaborador || item.collab || "",
+                        pontos: parseFloat(item["Peças produzidas"] || item.pecas || item.pontos) || 0,
+                        setor: item.Setor || item.setor || "Geral",
+                        obs: item.Observacoes || item.observacoes || item.obs || "",
+                        lote: item.Lote || item.lote || ""
+                    };
                 });
 
                 indicator.className = "sync-dot success";
                 text.innerText = "Sincronizado em tempo real";
                 
+                // Abre mirando sempre no dia atualizado
+                if (historicoProducao.length > 0) {
+                    let ordenados = [...historicoProducao].sort((a,b) => b.data.localeCompare(a.data));
+                    const ultimaDataComDados = ordenados[0].data;
+                    
+                    if(!document.getElementById('date-select').value) {
+                        document.getElementById('date-select').value = ultimaDataComDados;
+                    }
+                    if(!document.getElementById('filter-sector-date').value) {
+                        document.getElementById('filter-sector-date').value = ultimaDataComDados;
+                    }
+                }
+
                 updateDashboard();
                 renderHistoryTable();
                 renderFechamentoTable();
@@ -304,10 +324,8 @@
 
     function setInitialDates() {
         const hoje = new Date();
-        const dataStr = hoje.toISOString().split('T')[0];
-        document.getElementById('date-select').value = dataStr;
-        document.getElementById('filter-sector-date').value = "2026-07-17"; // Trava visual padrão no dia com dados reais
-        document.getElementById('filter-month').value = hoje.getFullYear() + "-" + ("0" + (hoje.getMonth() + 1)).slice(-2);
+        const mesAno = hoje.getFullYear() + "-" + ("0" + (hoje.getMonth() + 1)).slice(-2);
+        document.getElementById('filter-month').value = mesAno;
     }
 
     function switchTab(tabName) {
@@ -409,7 +427,7 @@
 
         colaboradoras.forEach(collab => {
             const total = historicoProducao
-                .filter(item => item.collab === collab && item.data === dataSel)
+                .filter(item => item.collab.trim().toLowerCase() === collab.trim().toLowerCase() && item.data === dataSel)
                 .reduce((soma, item) => soma + item.pontos, 0);
 
             const porcentagem = Math.round((total / meta) * 100);
@@ -438,7 +456,7 @@
         const fDate = document.getElementById('filter-date').value;
 
         const filtrados = historicoProducao.filter(item => {
-            return (fCollab === 'todos' || item.collab === fCollab) && (!fDate || item.data === fDate);
+            return (fCollab === 'todos' || item.collab.trim().toLowerCase() === fCollab.trim().toLowerCase()) && (!fDate || item.data === fDate);
         });
         filtrados.sort((a,b) => b.data.localeCompare(a.data));
 
@@ -470,7 +488,7 @@
         registrosDoMes.forEach(item => {
             const chave = item.data + "_" + item.collab;
             if (!mapaAgrupado[chave]) {
-                mapaAgrupado[chave] = { data: item.data, collab: item.collab, pontosTotal: 0, meta: item.meta || 292 };
+                mapaAgrupado[chave] = { data: item.data, collab: item.collab, pontosTotal: 0, meta: 292 };
             }
             mapaAgrupado[chave].pontosTotal += item.pontos;
         });
