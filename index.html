@@ -190,7 +190,6 @@
 </div>
 
 <script>
-    // IMPORTANTE: Se você gerou um link novo no Passo 1, cole ele aqui embaixo!
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyQy0x5F-AU7xosSgaHCKjwqe2-NJy_txRZPrQXvc2g_Qet_EAABGEfq-FLH_H0RvUz/exec";
     
     const servicos = [
@@ -253,10 +252,77 @@
         document.body.appendChild(script);
     }
 
+    // NOVA FUNÇÃO: Salvar os registros enviados do formulário para a planilha
+    function salvarProducao() {
+        const btnSave = document.getElementById('btn-save');
+        const collab = document.getElementById('collab-select').value;
+        const lote = document.getElementById('lote-input').value.trim();
+        const dataInput = document.getElementById('date-select').value;
+
+        if (!dataInput) {
+            alert("Por favor, selecione a data do trabalho!");
+            return;
+        }
+
+        let totalPontos = calculateTotal();
+        if (totalPontos <= 0) {
+            alert("Adicione a quantidade de pelo menos 1 serviço antes de salvar!");
+            return;
+        }
+
+        // Constrói o objeto JSON dos setores baseado no que foi preenchido
+        let objSetores = {};
+        servicos.forEach(s => {
+            let qtd = parseInt(document.getElementById(`input-${s.id}`).value) || 0;
+            if (qtd > 0) {
+                objSetores[s.nome] = qtd;
+            }
+        });
+
+        btnSave.disabled = true;
+        btnSave.innerText = "Salvando no Google Sheets...";
+
+        const dataFormatada = converterInputParaPlanilha(dataInput);
+
+        // Envia via parâmetros de URL no método GET que o Apps Script aceita
+        const urlParaSalvar = WEB_APP_URL + 
+            `?action=inserir` +
+            `&data=${encodeURIComponent(dataFormatada)}` +
+            `&colaborador=${encodeURIComponent(collab)}` +
+            `&pontos=${encodeURIComponent(totalPontos)}` +
+            `&setor=Geral` +
+            `&setores=${encodeURIComponent(JSON.stringify(objSetores))}` +
+            `&lote=${encodeURIComponent(lote)}`;
+
+        const callbackName = 'callback_save_' + Math.round(100000 * Math.random());
+        window[callbackName] = function(response) {
+            btnSave.disabled = false;
+            btnSave.innerText = "Salvar Registro";
+            
+            alert("Produção salva com sucesso!");
+            
+            // Limpa as quantidades do formulário
+            servicos.forEach(s => { document.getElementById(`input-${s.id}`).value = 0; });
+            document.getElementById('lote-input').value = "";
+            calculateTotal();
+            
+            // Recarrega o dashboard
+            carregarDadosDoDrive();
+
+            document.body.removeChild(script);
+            delete window[callbackName];
+        };
+
+        const script = document.createElement('script');
+        script.src = urlParaSalvar + '&callback=' + callbackName;
+        document.body.appendChild(script);
+    }
+
     function setInitialDates() {
-        document.getElementById('date-select').value = "2026-07-17";
-        document.getElementById('filter-date').value = "2026-07-17";
-        document.getElementById('filter-sector-date').value = "2026-07-17";
+        // Define as datas iniciais padrão para a data atual (20, Julho de 2026)
+        document.getElementById('date-select').value = "2026-07-20";
+        document.getElementById('filter-date').value = "2026-07-20";
+        document.getElementById('filter-sector-date').value = "2026-07-20";
         document.getElementById('filter-month').value = "2026-07";
     }
 
