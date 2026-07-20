@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.O.S - Gestão de Produção e Setores</title>
+    <title>S.O.S - Gestão de Production</title>
     <style>
         :root {
             --primary: #2b6cb0;
@@ -13,65 +13,48 @@
             --border: #e2e8f0;
             --success: #48bb78;
             --warning: #ecc94b;
-            --danger: #f56565;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 20px; }
         .container { max-width: 1250px; margin: 0 auto; }
-        
         header { text-align: center; margin-bottom: 25px; background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         header h1 { color: var(--primary); font-size: 24px; margin-bottom: 5px; }
-
         .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { padding: 12px 20px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: #4a5568; transition: all 0.2s; font-size: 13px; }
+        .tab-btn { padding: 12px 20px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: #4a5568; font-size: 13px; }
         .tab-btn.active { background: var(--primary); color: white; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
         .grid-main { display: grid; grid-template-columns: 1fr; gap: 20px; }
         @media (min-width: 900px) { .grid-main { grid-template-columns: 1.2fr 0.8fr; } }
-
         .card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); margin-bottom: 20px; }
-        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
         select, input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 16px; background: #fff; }
-
-        .services-grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-height: 450px; overflow-y: auto; padding-right: 5px; margin-bottom: 20px; }
+        .services-grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-height: 450px; overflow-y: auto; margin-bottom: 20px; }
         @media (min-width: 600px) { .services-grid { grid-template-columns: 1fr 1fr; } }
-
         .service-row { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; }
         .service-info { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #4a5568; }
         .service-info span { color: var(--primary); font-weight: bold; }
         .input-counter { display: flex; gap: 5px; }
         .btn-quick { background: #e2e8f0; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
-
         .live-preview { background: #edf2f7; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
         .total-value { font-size: 32px; font-weight: 800; color: var(--primary); }
-
         .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
         .status-abaixo { background-color: #fed7d7; color: #9b2c2c; }
         .status-dentro { background-color: #feebc8; color: #9c4221; }
         .status-acima { background-color: #c6f6d5; color: #22543d; }
-
         .btn-action { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .btn-reset { width: 100%; padding: 10px; background: transparent; color: #718096; border: 1px solid #cbd5e0; border-radius: 8px; margin-top: 10px; cursor: pointer; }
-
         .collaborator-status-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 12px; }
         .collab-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
         .progress-bar-bg { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; }
         .progress-bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
-
         .history-filters { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
         @media(min-width: 600px) { .history-filters { grid-template-columns: 1fr 1fr; } }
-
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: center; }
         th { background-color: #f7fafc; font-weight: bold; }
         .sector-badge { background-color: #edf2f7; padding: 4px 8px; border-radius: 6px; font-weight: bold; color: #2b6cb0; }
-        
         .sync-info { font-size: 12px; color: #718096; display: flex; align-items: center; gap: 6px; }
         .sync-dot { width: 8px; height: 8px; background-color: #cbd5e1; border-radius: 50%; display: inline-block; }
         .sync-dot.success { background-color: var(--success); }
@@ -87,7 +70,7 @@
         <p>Acompanhamento e Registro de Desempenho Diário</p>
     </header>
 
-    <div class="nav-tabs" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+    <div class="nav-tabs" style="justify-content: space-between; align-items: center;">
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button class="tab-btn active" id="btn-tab-registro" onclick="switchTab('registro')">Registrar Produção</button>
             <button class="tab-btn" id="btn-tab-historico" onclick="switchTab('historico')">Lançamentos Isolados (Lotes)</button>
@@ -96,22 +79,18 @@
         </div>
         <div class="sync-info">
             <span id="sync-indicator" class="sync-dot"></span>
-            <span id="sync-text">Carregando dados...</span>
+            <span id="sync-text">Conectando...</span>
         </div>
     </div>
 
-    <!-- ABA 1: REGISTRO -->
+    <!-- ABA 1 -->
     <div id="tab-registro" class="tab-content active">
         <div class="grid-main">
             <div class="card">
                 <div class="card-title">
                     <span>Lançar Produção</span>
-                    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px;">
-                        <label style="margin: 0;">Meta Diária (pts):</label>
-                        <input type="number" id="meta-input" value="292.00" step="10" oninput="calculateTotal()" style="width: 90px; padding: 5px; text-align: center;">
-                    </div>
+                    <span style="font-size: 14px;">Meta Diária: 292.00 pts</span>
                 </div>
-
                 <div class="form-group">
                     <label>Colaboradora</label>
                     <select id="collab-select">
@@ -122,29 +101,18 @@
                         <option value="Fabiana">Fabiana</option>
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <label>Número do Lote (Opcional)</label>
-                    <input type="text" id="lote-input" placeholder="Ex: LOTE-045">
+                    <label>Número do Lote</label>
+                    <input type="text" id="lote-input" placeholder="Ex: 119">
                 </div>
-
                 <div class="form-group">
                     <label>Data do Trabalho</label>
                     <input type="date" id="date-select" onchange="updateDashboard()">
                 </div>
-
-                <label style="margin-bottom: 10px; display: block;">Serviços Realizados</label>
                 <div class="services-grid" id="services-container"></div>
-
-                <div class="live-preview">
-                    <h3>Pontuação Acumulada Neste Lançamento</h3>
-                    <div class="total-value" id="live-total">0,00 pts</div>
-                </div>
-
+                <div class="live-preview"><div class="total-value" id="live-total">0,00 pts</div></div>
                 <button class="btn-action" id="btn-save" onclick="salvarProducao()">Salvar Registro</button>
-                <button class="btn-reset" onclick="resetForm()">Zerar Lançamentos Atuais</button>
             </div>
-
             <div class="card">
                 <div class="card-title">Desempenho Geral do Dia Selecionado</div>
                 <div id="dashboard-colaboradoras"></div>
@@ -152,12 +120,12 @@
         </div>
     </div>
 
-    <!-- ABA 2: HISTÓRICO ISOLADO POR LOTES -->
+    <!-- ABA 2 -->
     <div id="tab-historico" class="tab-content">
         <div class="card">
             <div class="card-title">Produção Separada por Lançamentos e Lotes</div>
             <div class="history-filters">
-                <div class="form-group" style="margin:0;">
+                <div>
                     <label>Filtrar por Colaboradora</label>
                     <select id="filter-collab" onchange="renderHistoryTable()">
                         <option value="todos">Todas</option>
@@ -168,72 +136,52 @@
                         <option value="Fabiana">Fabiana</option>
                     </select>
                 </div>
-                <div class="form-group" style="margin:0;">
+                <div>
                     <label>Filtrar por Data</label>
                     <input type="date" id="filter-date" onchange="renderHistoryTable()">
                 </div>
             </div>
             <div style="overflow-x: auto;">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Colaboradora</th>
-                            <th>Lote</th>
-                            <th>Pontuação deste Lote</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Data</th><th>Colaboradora</th><th>Lote</th><th>Pontuação deste Lote</th></tr></thead>
                     <tbody id="history-table-body"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- ABA 3: FECHAMENTO MENSAL -->
+    <!-- ABA 3 -->
     <div id="tab-fechamento" class="tab-content">
         <div class="card">
             <div class="card-title">Fechamento Mensal Integrado</div>
             <div class="history-filters" style="grid-template-columns: 1fr;">
-                <div class="form-group" style="margin:0;">
-                    <label>Selecione o Mês do Fechamento</label>
+                <div>
+                    <label>Selecione o Mês</label>
                     <input type="month" id="filter-month" onchange="renderFechamentoTable()">
                 </div>
             </div>
             <div style="overflow-x: auto;">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Data do Trabalho</th>
-                            <th>Colaboradora</th>
-                            <th>Pontuação Total Acumulada do Dia</th>
-                            <th>Status de Desempenho Real</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Data do Trabalho</th><th>Colaboradora</th><th>Pontuação Total Acumulada do Dia</th><th>Status</th></tr></thead>
                     <tbody id="fechamento-table-body"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- ABA 4: PRODUÇÃO POR SETOR -->
+    <!-- ABA 4 -->
     <div id="tab-setores" class="tab-content">
         <div class="card">
             <div class="card-title">Quantidades Brutas Produzidas por Setor / Serviço</div>
             <div class="history-filters" style="grid-template-columns: 1fr;">
-                <div class="form-group" style="margin:0;">
+                <div>
                     <label>Selecione o Dia para Medir os Setores</label>
                     <input type="date" id="filter-sector-date" onchange="renderSectorTable()">
                 </div>
             </div>
             <div style="overflow-x: auto;">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Setor / Serviço</th>
-                            <th>Colaboradora</th>
-                            <th>Quantidade Bruta de Peças</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Setor / Serviço</th><th>Colaboradora</th><th>Quantidade Bruta de Peças</th></tr></thead>
                     <tbody id="sector-table-body"></tbody>
                 </table>
             </div>
@@ -243,7 +191,6 @@
 
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyQy0x5F-AU7xosSgaHCKjwqe2-NJy_txRZPrQXvc2g_Qet_EAABGEfq-FLH_H0RvUz/exec";
-
     const servicos = [
         { id: "inspecao", nome: "Inspeção", preco: 0.63 },
         { id: "fotografia", nome: "Fotografia", preco: 1.70 },
@@ -261,23 +208,8 @@
         { id: "estoque", nome: "Estoque", preco: 18.75 },
         { id: "separacao", nome: "Separação", preco: 18.75 }
     ];
-
     const colaboradoras = ["Brenda", "Leidiane", "Cintia", "Raquel", "Fabiana"];
     let historicoProducao = [];
-
-    function extrairDataPura(dado) {
-        if (!dado) return "";
-        let s = String(dado).trim();
-        if (s.includes('T')) s = s.split('T')[0];
-        if (s.includes('-') && s.indexOf('-') === 4) {
-            let p = s.split('-');
-            return `${p[2]}/${p[1]}/${p[0]}`;
-        }
-        if (s.includes('/')) {
-            return s.split(' ')[0];
-        }
-        return s;
-    }
 
     function converterInputParaPlanilha(htmlDate) {
         if (!htmlDate) return "";
@@ -289,33 +221,23 @@
         const indicator = document.getElementById('sync-indicator');
         const text = document.getElementById('sync-text');
         indicator.className = "sync-dot syncing";
-        text.innerText = "Sincronizando com o Drive...";
+        text.innerText = "Sincronizando...";
 
         const callbackName = 'callback_' + Math.round(100000 * Math.random());
         window[callbackName] = function(data) {
             if (Array.isArray(data)) {
-                let linhasProcessadas = [];
-                
-                data.forEach(item => {
-                    let d = extrairDataPura(item.Data || item.data);
-                    let c = String(item.Colaborador || item.colaborador || item.collab || "").trim();
-                    let p = parseFloat(item["Peças produzidas"] || item.pecas || item.pontos) || 0;
-                    let s = item.Setor || item.setor || "Geral";
-                    let o = item.Observacoes || item.observacoes || item.obs || "";
-                    let l = String(item.Lote || item.lote || "").trim();
-
-                    // Identificador único para travar e ignorar linhas idênticas duplicadas pelo script da planilha
-                    let idChave = `${d}_${c}_${p}_${l}`;
-                    
-                    if (!linhasProcessadas.includes(idChave)) {
-                        linhasProcessadas.push(idChave);
-                        historicoProducao.push({ data: d, collab: c, pontos: p, setor: s, obs: o, lote: l });
-                    }
+                historicoProducao = data.map(item => {
+                    return {
+                        data: item.Data,
+                        collab: String(item.Colaborador).trim(),
+                        pontos: parseFloat(item["Peças produzidas"]) || 0,
+                        setor: item.Setor || "Geral",
+                        obs: item.Observacoes || "",
+                        lote: String(item.Lote || "").trim()
+                    };
                 });
-
                 indicator.className = "sync-dot success";
                 text.innerText = "Sincronizado em tempo real";
-
                 updateDashboard();
                 renderHistoryTable();
                 renderFechamentoTable();
@@ -326,17 +248,15 @@
         };
 
         const script = document.createElement('script');
-        historicoProducao = [];
         script.src = WEB_APP_URL + (WEB_APP_URL.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
         document.body.appendChild(script);
     }
 
     function setInitialDates() {
-        const hoje = new Date();
-        document.getElementById('date-select').value = "2026-07-17"; 
-        document.getElementById('filter-sector-date').value = "2026-07-17";
+        document.getElementById('date-select').value = "2026-07-17";
         document.getElementById('filter-date').value = "2026-07-17";
-        document.getElementById('filter-month').value = hoje.getFullYear() + "-" + ("0" + (hoje.getMonth() + 1)).slice(-2);
+        document.getElementById('filter-sector-date').value = "2026-07-17";
+        document.getElementById('filter-month').value = "2026-07";
     }
 
     function switchTab(tabName) {
@@ -344,11 +264,6 @@
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         document.getElementById('btn-tab-' + tabName).classList.add('active');
         document.getElementById('tab-' + tabName).classList.add('active');
-        
-        if (tabName === 'registro') updateDashboard();
-        if (tabName === 'historico') renderHistoryTable();
-        if (tabName === 'fechamento') renderFechamentoTable();
-        if (tabName === 'setores') renderSectorTable();
     }
 
     function renderServices() {
@@ -363,7 +278,6 @@
                     <input type="number" id="input-${servico.id}" value="0" min="0" oninput="calculateTotal()" style="width: 70px; text-align: center;">
                     <button type="button" class="btn-quick" onclick="adjustValue('${servico.id}', 1)">+1</button>
                     <button type="button" class="btn-quick" onclick="adjustValue('${servico.id}', 10)">+10</button>
-                    <button type="button" class="btn-quick" onclick="adjustValue('${servico.id}', 50)">+50</button>
                 </div>
             `;
             container.appendChild(row);
@@ -383,72 +297,23 @@
         return total;
     }
 
-    function resetForm() {
-        servicos.forEach(servico => { document.getElementById(`input-${servico.id}`).value = 0; });
-        document.getElementById('lote-input').value = '';
-        calculateTotal();
-    }
-
-    function salvarProducao() {
-        const collab = document.getElementById('collab-select').value;
-        const total = calculateTotal();
-        const loteVal = document.getElementById('lote-input').value;
-        const dataTrabalho = document.getElementById('date-select').value;
-        const btnSave = document.getElementById('btn-save');
-
-        if (total === 0) { alert("Preencha ao menos um serviço!"); return; }
-        btnSave.disabled = true;
-        btnSave.innerText = "Gravando...";
-
-        let detalhes = {};
-        servicos.forEach(s => {
-            let q = parseInt(document.getElementById(`input-${s.id}`).value) || 0;
-            if(q > 0) detalhes[s.nome] = q;
-        });
-
-        const payload = {
-            colaborador: collab,
-            pecas: total,
-            setor: "Geral",
-            observacoes: JSON.stringify(detalhes),
-            lote: loteVal,
-            dataCustom: dataTrabalho
-        };
-
-        fetch(WEB_APP_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        })
-        .then(() => {
-            alert("Produção gravada!");
-            resetForm();
-            setTimeout(carregarDadosDoDrive, 1500);
-        })
-        .catch(err => alert("Erro ao conectar."))
-        .finally(() => { btnSave.disabled = false; btnSave.innerText = "Salvar Registro"; });
-    }
-
     function updateDashboard() {
         const container = document.getElementById('dashboard-colaboradoras');
         container.innerHTML = '';
-        const dataSelRaw = document.getElementById('date-select').value;
-        const dataSelBR = converterInputParaPlanilha(dataSelRaw);
-        const meta = parseFloat(document.getElementById('meta-input').value) || 292.00;
+        const dataSelBR = converterInputParaPlanilha(document.getElementById('date-select').value);
 
         colaboradoras.forEach(collab => {
             const total = historicoProducao
                 .filter(item => item.collab.toLowerCase() === collab.toLowerCase() && item.data === dataSelBR)
                 .reduce((soma, item) => soma + item.pontos, 0);
 
-            const porcentagem = Math.round((total / meta) * 100);
-            let cor = total >= meta ? '#48bb78' : (total >= meta * 0.9 ? '#ecc94b' : '#f56565');
-            let textoStatus = total >= meta ? 'Meta Batida! 🔥' : (total >= meta * 0.9 ? 'Quase lá 🎯' : 'Abaixo da Meta 📉');
+            const porcentagem = Math.round((total / 292) * 100);
+            let cor = total >= 292 ? '#48bb78' : (total >= 262 ? '#ecc94b' : '#f56565');
+            let textoStatus = total >= 292 ? 'Meta Batida! 🔥' : 'Abaixo da Meta 📉';
 
             container.innerHTML += `
                 <div class="collaborator-status-card">
-                    <div class="collab-header"><strong>${collab}</strong> <span>${total.toFixed(2)} / ${meta.toFixed(2)} pts</span></div>
+                    <div class="collab-header"><strong>${collab}</strong> <span>${total.toFixed(2)} / 292.00 pts</span></div>
                     <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${Math.min(porcentagem, 100)}%; background-color: ${cor};"></div></div>
                     <div style="font-size: 12px; text-align: right; font-weight: bold; color: ${cor}; margin-top: 4px;">${textoStatus} (${porcentagem}%)</div>
                 </div>`;
@@ -459,26 +324,19 @@
         const tBody = document.getElementById('history-table-body');
         tBody.innerHTML = '';
         const fCollab = document.getElementById('filter-collab').value;
-        const fDateRaw = document.getElementById('filter-date').value;
-        const fDateBR = converterInputParaPlanilha(fDateRaw);
+        const fDateBR = converterInputParaPlanilha(document.getElementById('filter-date').value);
 
         const filtrados = historicoProducao.filter(item => {
-            return (fCollab === 'todos' || item.collab.toLowerCase() === fCollab.toLowerCase()) && (!fDateRaw || item.data === fDateBR);
+            return (fCollab === 'todos' || item.collab.toLowerCase() === fCollab.toLowerCase()) && item.data === fDateBR;
         });
 
         if(filtrados.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="4">Nenhum lote encontrado para as opções filtradas.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="4">Nenhum lote encontrado para este dia.</td></tr>`;
             return;
         }
 
         filtrados.forEach(item => {
-            tBody.innerHTML += `
-                <tr>
-                    <td>${item.data}</td>
-                    <td><strong>${item.collab}</strong></td>
-                    <td><span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-weight:bold;">${item.lote || 'Sem Lote'}</span></td>
-                    <td>${item.pontos.toFixed(2)} pts</td>
-                </tr>`;
+            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td><span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-weight:bold;">${item.lote || 'Sem Lote'}</span></td><td>${item.pontos.toFixed(2)} pts</td></tr>`;
         });
     }
 
@@ -488,57 +346,44 @@
         const fMonth = document.getElementById('filter-month').value;
         if (!fMonth) return;
 
-        let pMonth = fMonth.split('-');
-        let chaveMesBR = "/" + pMonth[1] + "/" + pMonth[0];
+        let p = fMonth.split('-');
+        let chaveMesBR = `/${p[1]}/${p[0]}`;
 
         const registrosDoMes = historicoProducao.filter(item => item.data.includes(chaveMesBR));
         let mapaAgrupado = {};
 
         registrosDoMes.forEach(item => {
             const chave = item.data + "_" + item.collab;
-            if (!mapaAgrupado[chave]) {
-                mapaAgrupado[chave] = { data: item.data, collab: item.collab, pontosTotal: 0, meta: 292 };
-            }
+            if (!mapaAgrupado[chave]) mapaAgrupado[chave] = { data: item.data, collab: item.collab, pontosTotal: 0 };
             mapaAgrupado[chave].pontosTotal += item.pontos;
         });
 
-        const listaFechamento = Object.values(mapaAgrupado).sort((a,b) => {
-            let ptA = a.data.split('/'); let ptB = b.data.split('/');
-            return (ptB[2]+ptB[1]+ptB[0]).localeCompare(ptA[2]+ptA[1]+ptA[0]);
-        });
-
-        if(listaFechamento.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="4">Nenhuma produção acumulada para este mês.</td></tr>`;
+        const lista = Object.values(mapaAgrupado);
+        if(lista.length === 0) {
+            tBody.innerHTML = `<tr><td colspan="4">Nenhuma produção acumulada neste mês.</td></tr>`;
             return;
         }
 
-        listaFechamento.forEach(item => {
-            let badge = item.pontosTotal >= item.meta ? `<span class="status-badge status-acima" style="margin:0;">Acima da Meta 🔥</span>` : (item.pontosTotal >= item.meta * 0.9 ? `<span class="status-badge status-dentro" style="margin:0;">Dentro da Meta 🎯</span>` : `<span class="status-badge status-abaixo" style="margin:0;">Abaixo da Meta 📉</span>`);
-            tBody.innerHTML += `
-                <tr>
-                    <td>${item.data}</td>
-                    <td><strong>${item.collab}</strong></td>
-                    <td style="font-weight:bold; color:#2b6cb0;">${item.pontosTotal.toFixed(2)} pts</td>
-                    <td>${badge}</td>
-                </tr>`;
+        lista.forEach(item => {
+            let badge = item.pontosTotal >= 292 ? `<span class="status-badge status-acima">Meta Batida 🔥</span>` : `<span class="status-badge status-abaixo">Abaixo 📉</span>`;
+            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color:#2b6cb0;">${item.pontosTotal.toFixed(2)} pts</td><td>${badge}</td></tr>`;
         });
     }
 
     function renderSectorTable() {
         const tBody = document.getElementById('sector-table-body');
         tBody.innerHTML = '';
-        const fDateRaw = document.getElementById('filter-sector-date').value;
-        const fDateBR = converterInputParaPlanilha(fDateRaw);
-        if (!fDateRaw) return;
+        const fDateBR = converterInputParaPlanilha(document.getElementById('filter-sector-date').value);
 
         const registrosDoDia = historicoProducao.filter(item => item.data === fDateBR);
-        let dadosEncontrados = false;
-        
+        if(registrosDoDia.length === 0) {
+            tBody.innerHTML = `<tr><td colspan="3">Nenhuma quantidade registrada para esta data.</td></tr>`;
+            return;
+        }
+
         registrosDoDia.forEach(item => {
-            dadosEncontrados = true;
             let nomeSetor = "Geral / Outros";
             let qtdPecas = 0;
-            
             for(let s of servicos) {
                 let rest = item.pontos / s.preco;
                 if(Math.abs(rest - Math.round(rest)) < 0.01 && rest > 0) {
@@ -547,26 +392,15 @@
                     break;
                 }
             }
-            if(qtdPecas === 0) { qtdPecas = Math.round(item.pontos); }
-
-            tBody.innerHTML += `
-                <tr>
-                    <td><span class="sector-badge">${nomeSetor}</span></td>
-                    <td><strong>${item.collab}</strong></td>
-                    <td style="font-weight:bold; color:#2b6cb0;">${qtdPecas} peças</td>
-                </tr>`;
+            if(qtdPecas === 0) qtdPecas = Math.round(item.pontos);
+            tBody.innerHTML += `<tr><td><span class="sector-badge">${nomeSetor}</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color:#2b6cb0;">${qtdPecas} peças</td></tr>`;
         });
-
-        if(!dadosEncontrados) {
-            tBody.innerHTML = `<tr><td colspan="3">Nenhuma quantidade registrada para esta data. Selecione outro dia.</td></tr>`;
-        }
     }
 
     window.onload = function() {
         setInitialDates();
         renderServices();
         carregarDadosDoDrive();
-        setInterval(carregarDadosDoDrive, 60000);
     };
 </script>
 </body>
