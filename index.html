@@ -265,6 +265,26 @@
     const colaboradoras = ["Brenda", "Leidiane", "Cintia", "Raquel", "Fabiana"];
     let historicoProducao = [];
 
+    function extrairDataPura(dado) {
+        if (!dado) return "";
+        let s = String(dado).trim();
+        if (s.includes('T')) s = s.split('T')[0];
+        if (s.includes('-') && s.indexOf('-') === 4) {
+            let p = s.split('-');
+            return `${p[2]}/${p[1]}/${p[0]}`;
+        }
+        if (s.includes('/')) {
+            return s.split(' ')[0];
+        }
+        return s;
+    }
+
+    function converterInputParaPlanilha(htmlDate) {
+        if (!htmlDate) return "";
+        let p = htmlDate.split('-');
+        return `${p[2]}/${p[1]}/${p[0]}`;
+    }
+
     function carregarDadosDoDrive() {
         const indicator = document.getElementById('sync-indicator');
         const text = document.getElementById('sync-text');
@@ -274,39 +294,27 @@
         const callbackName = 'callback_' + Math.round(100000 * Math.random());
         window[callbackName] = function(data) {
             if (Array.isArray(data)) {
-                historicoProducao = data.map(item => {
-                    let dStr = item.Data || item.data || "";
-                    if(dStr.includes('T')) dStr = dStr.split('T')[0];
-                    if(dStr.includes('/')) {
-                        let p = dStr.split(' ')[0].split('/');
-                        dStr = p[2] + "-" + p[1] + "-" + p[0];
+                let linhasProcessadas = [];
+                
+                data.forEach(item => {
+                    let d = extrairDataPura(item.Data || item.data);
+                    let c = String(item.Colaborador || item.colaborador || item.collab || "").trim();
+                    let p = parseFloat(item["Peças produzidas"] || item.pecas || item.pontos) || 0;
+                    let s = item.Setor || item.setor || "Geral";
+                    let o = item.Observacoes || item.observacoes || item.obs || "";
+                    let l = String(item.Lote || item.lote || "").trim();
+
+                    // Identificador único para travar e ignorar linhas idênticas duplicadas pelo script da planilha
+                    let idChave = `${d}_${c}_${p}_${l}`;
+                    
+                    if (!linhasProcessadas.includes(idChave)) {
+                        linhasProcessadas.push(idChave);
+                        historicoProducao.push({ data: d, collab: c, pontos: p, setor: s, obs: o, lote: l });
                     }
-                    // MAPEAMENTO EXATO DA SUA PLANILHA: "Colaborador" e "Peças produzidas"
-                    return {
-                        data: dStr,
-                        collab: item.Colaborador || item.colaborador || item.collab || "",
-                        pontos: parseFloat(item["Peças produzidas"] || item.pecas || item.pontos) || 0,
-                        setor: item.Setor || item.setor || "Geral",
-                        obs: item.Observacoes || item.observacoes || item.obs || "",
-                        lote: item.Lote || item.lote || ""
-                    };
                 });
 
                 indicator.className = "sync-dot success";
                 text.innerText = "Sincronizado em tempo real";
-                
-                // Abre mirando sempre no dia atualizado
-                if (historicoProducao.length > 0) {
-                    let ordenados = [...historicoProducao].sort((a,b) => b.data.localeCompare(a.data));
-                    const ultimaDataComDados = ordenados[0].data;
-                    
-                    if(!document.getElementById('date-select').value) {
-                        document.getElementById('date-select').value = ultimaDataComDados;
-                    }
-                    if(!document.getElementById('filter-sector-date').value) {
-                        document.getElementById('filter-sector-date').value = ultimaDataComDados;
-                    }
-                }
 
                 updateDashboard();
                 renderHistoryTable();
@@ -318,14 +326,17 @@
         };
 
         const script = document.createElement('script');
+        historicoProducao = [];
         script.src = WEB_APP_URL + (WEB_APP_URL.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
         document.body.appendChild(script);
     }
 
     function setInitialDates() {
         const hoje = new Date();
-        const mesAno = hoje.getFullYear() + "-" + ("0" + (hoje.getMonth() + 1)).slice(-2);
-        document.getElementById('filter-month').value = mesAno;
+        document.getElementById('date-select').value = "2026-07-17"; 
+        document.getElementById('filter-sector-date').value = "2026-07-17";
+        document.getElementById('filter-date').value = "2026-07-17";
+        document.getElementById('filter-month').value = hoje.getFullYear() + "-" + ("0" + (hoje.getMonth() + 1)).slice(-2);
     }
 
     function switchTab(tabName) {
@@ -422,12 +433,13 @@
     function updateDashboard() {
         const container = document.getElementById('dashboard-colaboradoras');
         container.innerHTML = '';
-        const dataSel = document.getElementById('date-select').value;
+        const dataSelRaw = document.getElementById('date-select').value;
+        const dataSelBR = converterInputParaPlanilha(dataSelRaw);
         const meta = parseFloat(document.getElementById('meta-input').value) || 292.00;
 
         colaboradoras.forEach(collab => {
             const total = historicoProducao
-                .filter(item => item.collab.trim().toLowerCase() === collab.trim().toLowerCase() && item.data === dataSel)
+                .filter(item => item.collab.toLowerCase() === collab.toLowerCase() && item.data === dataSelBR)
                 .reduce((soma, item) => soma + item.pontos, 0);
 
             const porcentagem = Math.round((total / meta) * 100);
@@ -443,32 +455,26 @@
         });
     }
 
-    function formatarData(dataStr) {
-        if (!dataStr || !dataStr.includes('-')) return dataStr;
-        const partes = dataStr.split('-');
-        return `${partes[2]}/${partes[1]}/${partes[0]}`;
-    }
-
     function renderHistoryTable() {
         const tBody = document.getElementById('history-table-body');
         tBody.innerHTML = '';
         const fCollab = document.getElementById('filter-collab').value;
-        const fDate = document.getElementById('filter-date').value;
+        const fDateRaw = document.getElementById('filter-date').value;
+        const fDateBR = converterInputParaPlanilha(fDateRaw);
 
         const filtrados = historicoProducao.filter(item => {
-            return (fCollab === 'todos' || item.collab.trim().toLowerCase() === fCollab.trim().toLowerCase()) && (!fDate || item.data === fDate);
+            return (fCollab === 'todos' || item.collab.toLowerCase() === fCollab.toLowerCase()) && (!fDateRaw || item.data === fDateBR);
         });
-        filtrados.sort((a,b) => b.data.localeCompare(a.data));
 
         if(filtrados.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="4">Nenhum lote encontrado.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="4">Nenhum lote encontrado para as opções filtradas.</td></tr>`;
             return;
         }
 
         filtrados.forEach(item => {
             tBody.innerHTML += `
                 <tr>
-                    <td>${formatarData(item.data)}</td>
+                    <td>${item.data}</td>
                     <td><strong>${item.collab}</strong></td>
                     <td><span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-weight:bold;">${item.lote || 'Sem Lote'}</span></td>
                     <td>${item.pontos.toFixed(2)} pts</td>
@@ -482,7 +488,10 @@
         const fMonth = document.getElementById('filter-month').value;
         if (!fMonth) return;
 
-        const registrosDoMes = historicoProducao.filter(item => item.data.startsWith(fMonth));
+        let pMonth = fMonth.split('-');
+        let chaveMesBR = "/" + pMonth[1] + "/" + pMonth[0];
+
+        const registrosDoMes = historicoProducao.filter(item => item.data.includes(chaveMesBR));
         let mapaAgrupado = {};
 
         registrosDoMes.forEach(item => {
@@ -493,10 +502,13 @@
             mapaAgrupado[chave].pontosTotal += item.pontos;
         });
 
-        const listaFechamento = Object.values(mapaAgrupado).sort((a,b) => b.data.localeCompare(a.data));
+        const listaFechamento = Object.values(mapaAgrupado).sort((a,b) => {
+            let ptA = a.data.split('/'); let ptB = b.data.split('/');
+            return (ptB[2]+ptB[1]+ptB[0]).localeCompare(ptA[2]+ptA[1]+ptA[0]);
+        });
 
         if(listaFechamento.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="4">Nenhuma produção acumulada este mês.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="4">Nenhuma produção acumulada para este mês.</td></tr>`;
             return;
         }
 
@@ -504,7 +516,7 @@
             let badge = item.pontosTotal >= item.meta ? `<span class="status-badge status-acima" style="margin:0;">Acima da Meta 🔥</span>` : (item.pontosTotal >= item.meta * 0.9 ? `<span class="status-badge status-dentro" style="margin:0;">Dentro da Meta 🎯</span>` : `<span class="status-badge status-abaixo" style="margin:0;">Abaixo da Meta 📉</span>`);
             tBody.innerHTML += `
                 <tr>
-                    <td>${formatarData(item.data)}</td>
+                    <td>${item.data}</td>
                     <td><strong>${item.collab}</strong></td>
                     <td style="font-weight:bold; color:#2b6cb0;">${item.pontosTotal.toFixed(2)} pts</td>
                     <td>${badge}</td>
@@ -515,10 +527,11 @@
     function renderSectorTable() {
         const tBody = document.getElementById('sector-table-body');
         tBody.innerHTML = '';
-        const fDate = document.getElementById('filter-sector-date').value;
-        if (!fDate) return;
+        const fDateRaw = document.getElementById('filter-sector-date').value;
+        const fDateBR = converterInputParaPlanilha(fDateRaw);
+        if (!fDateRaw) return;
 
-        const registrosDoDia = historicoProducao.filter(item => item.data === fDate);
+        const registrosDoDia = historicoProducao.filter(item => item.data === fDateBR);
         let dadosEncontrados = false;
         
         registrosDoDia.forEach(item => {
