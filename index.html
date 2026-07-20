@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.O.S - Gestão de Production</title>
+    <title>S.O.S - Gestão de Produção</title>
     <style>
         :root {
             --primary: #2b6cb0;
@@ -190,7 +190,9 @@
 </div>
 
 <script>
+    // IMPORTANTE: Se você gerou um link novo no Passo 1, cole ele aqui embaixo!
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyQy0x5F-AU7xosSgaHCKjwqe2-NJy_txRZPrQXvc2g_Qet_EAABGEfq-FLH_H0RvUz/exec";
+    
     const servicos = [
         { id: "inspecao", nome: "Inspeção", preco: 0.63 },
         { id: "fotografia", nome: "Fotografia", preco: 1.70 },
@@ -228,12 +230,11 @@
             if (Array.isArray(data)) {
                 historicoProducao = data.map(item => {
                     return {
-                        data: item.Data,
-                        collab: String(item.Colaborador).trim(),
+                        data: String(item["Data"] || "").trim(),
+                        collab: String(item["Colaborador"] || "").trim(),
                         pontos: parseFloat(item["Peças produzidas"]) || 0,
-                        setor: item.Setor || "Geral",
-                        obs: item.Observacoes || "",
-                        lote: String(item.Lote || "").trim()
+                        setoresJson: String(item["Setores"] || "").trim(),
+                        lote: String(item["Lote"] || "").trim()
                     };
                 });
                 indicator.className = "sync-dot success";
@@ -381,20 +382,29 @@
             return;
         }
 
+        let linhasRenderizadas = 0;
+
         registrosDoDia.forEach(item => {
-            let nomeSetor = "Geral / Outros";
-            let qtdPecas = 0;
-            for(let s of servicos) {
-                let rest = item.pontos / s.preco;
-                if(Math.abs(rest - Math.round(rest)) < 0.01 && rest > 0) {
-                    nomeSetor = s.nome;
-                    qtdPecas = Math.round(rest);
-                    break;
+            try {
+                if (item.setoresJson && item.setoresJson.startsWith('{')) {
+                    let objSetores = JSON.parse(item.setoresJson);
+                    for (let [nomeDoSetor, qtdPecas] of Object.entries(objSetores)) {
+                        tBody.innerHTML += `<tr><td><span class="sector-badge">${nomeDoSetor}</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color:#2b6cb0;">${qtdPecas} peças</td></tr>`;
+                        linhasRenderizadas++;
+                    }
+                } else {
+                    tBody.innerHTML += `<tr><td><span class="sector-badge">Geral / Outros</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color:#2b6cb0;">${Math.round(item.pontos)} peças</td></tr>`;
+                    linhasRenderizadas++;
                 }
+            } catch (e) {
+                tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color:#2b6cb0;">${Math.round(item.pontos)} peças</td></tr>`;
+                linhasRenderizadas++;
             }
-            if(qtdPecas === 0) qtdPecas = Math.round(item.pontos);
-            tBody.innerHTML += `<tr><td><span class="sector-badge">${nomeSetor}</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color:#2b6cb0;">${qtdPecas} peças</td></tr>`;
         });
+        
+        if(linhasRenderizadas === 0) {
+            tBody.innerHTML = `<tr><td colspan="3">Nenhuma quantidade registrada para esta data.</td></tr>`;
+        }
     }
 
     window.onload = function() {
