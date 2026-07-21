@@ -330,7 +330,7 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyQy0x5F-AU7xosSgaHCKjwqe2-NJy_txRZPrQXvc2g_Qet_EAABGEfq-FLH_H0RvUz/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyXiFYRkyUEd5fJyQGgIy1Znh7t1dMnYOwkeBiNeOsXiTbbhVGFg5Lolk4ht9oh-CmS/exec";
     
     const servicos = [
         { id: "inspecao", nome: "Inspeção", preco: 0.63 },
@@ -518,7 +518,7 @@
             container.innerHTML += `
                 <div class="collaborator-status-card">
                     <div class="collab-header"><span>${collab}</span> <span style="color: ${cor}">${total.toFixed(2)} / 292.00 pts</span></div>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${Math.min(porcentagem, 100)}%; background: ${cor}; box-shadow: 0 0 10px ${cor};"></div></div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${Math.min(porcentagem, 100)}%; background: ${cor}; box-shadow: 0 0 10px${cor};"></div></div>
                     <div style="font-size: 12px; text-align: right; font-weight: bold; color: ${cor};">${textoStatus} (${porcentagem}%)</div>
                 </div>`;
         });
@@ -540,7 +540,7 @@
         }
 
         filtrados.forEach(item => {
-            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td><span class="sector-badge">${item.lote || 'Sem Lote'}</span></td><td style="color: var(--primary-neon); font-weight: bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
+            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td><span class="sector-badge">${item.lote \vert{}\vert{} 'Sem Lote'}</span></td><td style="color: var(--primary-neon); font-weight: bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
         });
     }
 
