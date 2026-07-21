@@ -383,11 +383,14 @@
                 renderFechamentoTable();
                 renderSectorTable();
             }
-            document.body.removeChild(script);
+            if (document.getElementById(callbackName)) {
+                document.body.removeChild(document.getElementById(callbackName));
+            }
             delete window[callbackName];
         };
 
         const script = document.createElement('script');
+        script.id = callbackName;
         script.src = WEB_APP_URL + (WEB_APP_URL.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
         document.body.appendChild(script);
     }
@@ -440,11 +443,14 @@
             calculateTotal();
             carregarDadosDoDrive();
 
-            document.body.removeChild(script);
+            if (document.getElementById(callbackName)) {
+                document.body.removeChild(document.getElementById(callbackName));
+            }
             delete window[callbackName];
         };
 
         const script = document.createElement('script');
+        script.id = callbackName;
         script.src = urlParaSalvar + '&callback=' + callbackName;
         document.body.appendChild(script);
     }
