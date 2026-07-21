@@ -293,7 +293,7 @@
     <!-- ABA 3: FECHAMENTO -->
     <div id="tab-fechamento" class="tab-content">
         <div class="card">
-            <div class="card-title">Fechamento Mensal Accumulado</div>
+            <div class="card-title">Fechamento Mensal Acumulado</div>
             <div class="history-filters" style="grid-template-columns: 1fr;">
                 <div>
                     <label>Selecione o Mês</label>
@@ -312,7 +312,7 @@
     <!-- ABA 4: SETORES -->
     <div id="tab-setores" class="tab-content">
         <div class="card">
-            <div class="card-title">Quantidades Brutas por Setor</div>
+            <div class="card-title">Quantidades e Pontuações por Setor</div>
             <div class="history-filters" style="grid-template-columns: 1fr;">
                 <div>
                     <label>Selecione o Dia</label>
@@ -321,7 +321,7 @@
             </div>
             <div style="overflow-x: auto;">
                 <table>
-                    <thead><tr><th>Setor / Serviço</th><th>Colaboradora</th><th>Peças Produzidas</th></tr></thead>
+                    <thead><tr><th>Setor / Serviço</th><th>Colaboradora</th><th>Peças Produzidas</th><th>Pontuação Gerada</th></tr></thead>
                     <tbody id="sector-table-body"></tbody>
                 </table>
             </div>
@@ -427,7 +427,7 @@
             `?action=inserir` +
             `&data=${encodeURIComponent(dataFormatada)}` +
             `&colaborador=${encodeURIComponent(collab)}` +
-            `&pontos=${encodeURIComponent(totalPontos)}` +
+            `&pontos=${encodeURIComponent(totalPontos.toFixed(2))}` +
             `&setor=Geral` +
             `&setores=${encodeURIComponent(JSON.stringify(objSetores))}` +
             `&lote=${encodeURIComponent(lote)}`;
@@ -456,11 +456,11 @@
     }
 
     function setInitialDates() {
-        const hoje = "2026-07-21";
+        const hoje = new Date().toISOString().split('T')[0];
         document.getElementById('date-select').value = hoje;
         document.getElementById('filter-date').value = hoje;
         document.getElementById('filter-sector-date').value = hoje;
-        document.getElementById('filter-month').value = "2026-07";
+        document.getElementById('filter-month').value = hoje.substring(0, 7);
     }
 
     function switchTab(tabName) {
@@ -518,7 +518,7 @@
             container.innerHTML += `
                 <div class="collaborator-status-card">
                     <div class="collab-header"><span>${collab}</span> <span style="color: ${cor}">${total.toFixed(2)} / 292.00 pts</span></div>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${Math.min(porcentagem, 100)}%; background: ${cor}; box-shadow: 0 0 10px${cor};"></div></div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${Math.min(porcentagem, 100)}%; background: ${cor}; box-shadow: 0 0 10px ${cor};"></div></div>
                     <div style="font-size: 12px; text-align: right; font-weight: bold; color: ${cor};">${textoStatus} (${porcentagem}%)</div>
                 </div>`;
         });
@@ -540,7 +540,8 @@
         }
 
         filtrados.forEach(item => {
-            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td><span class="sector-badge">${item.lote \vert{}\vert{} 'Sem Lote'}</span></td><td style="color: var(--primary-neon); font-weight: bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
+            const numLote = item.lote ? item.lote : 'Sem Lote';
+            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td><span class="sector-badge">${numLote}</span></td><td style="color: var(--primary-neon); font-weight: bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
         });
     }
 
@@ -581,27 +582,26 @@
 
         const registrosDoDia = historicoProducao.filter(item => item.data === fDateBR);
         if(registrosDoDia.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="3" style="color: var(--text-muted);">Nenhuma quantidade registrada para esta data.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="4" style="color: var(--text-muted);">Nenhuma quantidade registrada para esta data.</td></tr>`;
             return;
         }
-
-        let linhasRenderizadas = 0;
 
         registrosDoDia.forEach(item => {
             try {
                 if (item.setoresJson && item.setoresJson.startsWith('{')) {
                     let objSetores = JSON.parse(item.setoresJson);
                     for (let [nomeDoSetor, qtdPecas] of Object.entries(objSetores)) {
-                        tBody.innerHTML += `<tr><td><span class="sector-badge">${nomeDoSetor}</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${qtdPecas} peças</td></tr>`;
-                        linhasRenderizadas++;
+                        let servObj = servicos.find(s => s.nome.toLowerCase() === nomeDoSetor.toLowerCase());
+                        let precoUnit = servObj ? servObj.preco : 1.0;
+                        let ptsSetor = (qtdPecas * precoUnit).toFixed(2);
+
+                        tBody.innerHTML += `<tr><td><span class="sector-badge">${nomeDoSetor}</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${qtdPecas} peças</td><td style="color: var(--success-glow); font-weight:bold;">${ptsSetor} pts</td></tr>`;
                     }
                 } else {
-                    tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${Math.round(item.pontos)} peças</td></tr>`;
-                    linhasRenderizadas++;
+                    tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${Math.round(item.pontos)} peças</td><td style="color: var(--success-glow); font-weight:bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
                 }
             } catch (e) {
-                tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${Math.round(item.pontos)} peças</td></tr>`;
-                linhasRenderizadas++;
+                tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${Math.round(item.pontos)} peças</td><td style="color: var(--success-glow); font-weight:bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
             }
         });
     }
