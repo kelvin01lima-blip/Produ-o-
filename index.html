@@ -3,62 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.O.S - Gestão de Produção</title>
+    <title>S.O.S - Cyber Production System</title>
     <style>
         :root {
-            --primary: #2b6cb0;
-            --bg: #f7fafc;
-            --card-bg: #ffffff;
-            --text: #2d3748;
-            --border: #e2e8f0;
-            --success: #48bb78;
-            --warning: #ecc94b;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --primary-neon: #38bdf8;
+            --accent-purple: #818cf8;
+            --success-glow: #22c55e;
+            --warning-glow: #eab308;
+            --danger-glow: #f43f5e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding: 20px; }
-        .container { max-width: 1250px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 25px; background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        header h1 { color: var(--primary); font-size: 24px; margin-bottom: 5px; }
-        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { padding: 12px 20px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: #4a5568; font-size: 13px; }
-        .tab-btn.active { background: var(--primary); color: white; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background: var(--bg-dark); color: var(--text-main); padding: 25px; background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 70%); min-height: 100vh; }
+        .container { max-width: 1300px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        header h1 {
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        header p { color: var(--text-muted); font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
+
+        .nav-tabs { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .tabs-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .tab-btn {
+            padding: 12px 22px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary-neon), var(--accent-purple));
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+        .tab-btn:hover:not(.active) { background: rgba(255, 255, 255, 0.05); color: #fff; }
+
+        .sync-info { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; background: var(--card-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--card-border); }
+        .sync-dot { width: 10px; height: 10px; border-radius: 50%; background: #64748b; }
+        .sync-dot.success { background: var(--success-glow); box-shadow: 0 0 10px var(--success-glow); }
+        .sync-dot.syncing { background: var(--warning-glow); box-shadow: 0 0 10px var(--warning-glow); animation: pulse 1s infinite alternate; }
+
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .grid-main { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        @media (min-width: 900px) { .grid-main { grid-template-columns: 1.2fr 0.8fr; } }
-        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); margin-bottom: 20px; }
-        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
-        select, input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 16px; background: #fff; }
-        .services-grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-height: 450px; overflow-y: auto; margin-bottom: 20px; }
+
+        .grid-main { display: grid; grid-template-columns: 1fr; gap: 25px; }
+        @media (min-width: 950px) { .grid-main { grid-template-columns: 1.2fr 0.8fr; } }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            font-size: 15px;
+            color: #fff;
+            outline: none;
+            transition: all 0.3s;
+        }
+        select:focus, input:focus { border-color: var(--primary-neon); box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+
+        .services-grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-height: 420px; overflow-y: auto; padding-right: 5px; margin-bottom: 20px; }
         @media (min-width: 600px) { .services-grid { grid-template-columns: 1fr 1fr; } }
-        .service-row { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; }
-        .service-info { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #4a5568; }
-        .service-info span { color: var(--primary); font-weight: bold; }
-        .input-counter { display: flex; gap: 5px; }
-        .btn-quick { background: #e2e8f0; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
-        .live-preview { background: #edf2f7; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
-        .total-value { font-size: 32px; font-weight: 800; color: var(--primary); }
-        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
-        .status-abaixo { background-color: #fed7d7; color: #9b2c2c; }
-        .status-dentro { background-color: #feebc8; color: #9c4221; }
-        .status-acima { background-color: #c6f6d5; color: #22543d; }
-        .btn-action { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .collaborator-status-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 12px; }
-        .collab-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
-        .progress-bar-bg { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
-        .history-filters { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+
+        .service-row {
+            background: rgba(15, 23, 42, 0.4);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .service-info { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #cbd5e1; display: flex; justify-content: space-between; }
+        .service-info span { color: var(--primary-neon); }
+
+        .input-counter { display: flex; gap: 6px; }
+        .btn-quick {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            transition: 0.2s;
+        }
+        .btn-quick:hover { background: var(--primary-neon); color: #000; }
+
+        .live-preview {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.1);
+        }
+        .live-preview-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .total-value { font-size: 36px; font-weight: 800; color: var(--primary-neon); text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-neon), var(--accent-purple));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+            transition: all 0.3s;
+        }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(56, 189, 248, 0.6); }
+
+        .collaborator-status-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+        .collab-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; font-size: 15px; }
+        .progress-bar-bg { background: rgba(255, 255, 255, 0.05); height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 6px; }
+        .progress-bar-fill { height: 100%; width: 0%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .history-filters { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; background: rgba(15, 23, 42, 0.4); padding: 18px; border-radius: 12px; border: 1px solid var(--card-border); }
         @media(min-width: 600px) { .history-filters { grid-template-columns: 1fr 1fr; } }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: center; }
-        th { background-color: #f7fafc; font-weight: bold; }
-        .sector-badge { background-color: #edf2f7; padding: 4px 8px; border-radius: 6px; font-weight: bold; color: #2b6cb0; }
-        .sync-info { font-size: 12px; color: #718096; display: flex; align-items: center; gap: 6px; }
-        .sync-dot { width: 8px; height: 8px; background-color: #cbd5e1; border-radius: 50%; display: inline-block; }
-        .sync-dot.success { background-color: var(--success); }
-        .sync-dot.syncing { background-color: var(--warning); animation: pulse 1s infinite alternate; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 14px; border-bottom: 1px solid var(--card-border); text-align: center; font-size: 14px; }
+        th { background: rgba(15, 23, 42, 0.6); color: var(--text-muted); text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+
+        .status-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
+        .status-acima { background: rgba(34, 197, 94, 0.2); color: var(--success-glow); border: 1px solid var(--success-glow); }
+        .status-abaixo { background: rgba(244, 63, 94, 0.2); color: var(--danger-glow); border: 1px solid var(--danger-glow); }
+        .sector-badge { background: rgba(56, 189, 248, 0.15); color: var(--primary-neon); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.3); }
+
         @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
     </style>
 </head>
@@ -70,11 +203,11 @@
         <p>Acompanhamento e Registro de Desempenho Diário</p>
     </header>
 
-    <div class="nav-tabs" style="justify-content: space-between; align-items: center;">
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="tab-btn active" id="btn-tab-registro" onclick="switchTab('registro')">Registrar Produção</button>
-            <button class="tab-btn" id="btn-tab-historico" onclick="switchTab('historico')">Lançamentos Isolados (Lotes)</button>
-            <button class="tab-btn" id="btn-tab-fechamento" onclick="switchTab('fechamento')">Fechamento Mensal (Acumulado)</button>
+    <div class="nav-tabs">
+        <div class="tabs-group">
+            <button class="tab-btn active" id="btn-tab-registro" onclick="switchTab('registro')">Lançar Produção</button>
+            <button class="tab-btn" id="btn-tab-historico" onclick="switchTab('historico')">Lotes Isolados</button>
+            <button class="tab-btn" id="btn-tab-fechamento" onclick="switchTab('fechamento')">Fechamento Mensal</button>
             <button class="tab-btn" id="btn-tab-setores" onclick="switchTab('setores')">Produção por Setor 📊</button>
         </div>
         <div class="sync-info">
@@ -83,13 +216,13 @@
         </div>
     </div>
 
-    <!-- ABA 1 -->
+    <!-- ABA 1: REGISTRO -->
     <div id="tab-registro" class="tab-content active">
         <div class="grid-main">
             <div class="card">
                 <div class="card-title">
-                    <span>Lançar Produção</span>
-                    <span style="font-size: 14px;">Meta Diária: 292.00 pts</span>
+                    <span>Registrar Produção</span>
+                    <span style="font-size: 13px; color: var(--text-muted);">Meta: 292.00 pts</span>
                 </div>
                 <div class="form-group">
                     <label>Colaboradora</label>
@@ -109,24 +242,31 @@
                     <label>Data do Trabalho</label>
                     <input type="date" id="date-select" onchange="updateDashboard()">
                 </div>
+                
                 <div class="services-grid" id="services-container"></div>
-                <div class="live-preview"><div class="total-value" id="live-total">0,00 pts</div></div>
-                <button class="btn-action" id="btn-save" onclick="salvarProducao()">Salvar Registro</button>
+                
+                <div class="live-preview">
+                    <div class="live-preview-label">Total do Lançamento</div>
+                    <div class="total-value" id="live-total">0,00 pts</div>
+                </div>
+                
+                <button class="btn-action" id="btn-save" onclick="salvarProducao()">Salvar Produção</button>
             </div>
+
             <div class="card">
-                <div class="card-title">Desempenho Geral do Dia Selecionado</div>
+                <div class="card-title">Desempenho Geral do Dia</div>
                 <div id="dashboard-colaboradoras"></div>
             </div>
         </div>
     </div>
 
-    <!-- ABA 2 -->
+    <!-- ABA 2: LOTES -->
     <div id="tab-historico" class="tab-content">
         <div class="card">
-            <div class="card-title">Produção Separada por Lançamentos e Lotes</div>
+            <div class="card-title">Lançamentos Isolados por Lote</div>
             <div class="history-filters">
                 <div>
-                    <label>Filtrar por Colaboradora</label>
+                    <label>Filtrar Colaboradora</label>
                     <select id="filter-collab" onchange="renderHistoryTable()">
                         <option value="todos">Todas</option>
                         <option value="Brenda">Brenda</option>
@@ -137,23 +277,23 @@
                     </select>
                 </div>
                 <div>
-                    <label>Filtrar por Data</label>
+                    <label>Filtrar Data</label>
                     <input type="date" id="filter-date" onchange="renderHistoryTable()">
                 </div>
             </div>
             <div style="overflow-x: auto;">
                 <table>
-                    <thead><tr><th>Data</th><th>Colaboradora</th><th>Lote</th><th>Pontuação deste Lote</th></tr></thead>
+                    <thead><tr><th>Data</th><th>Colaboradora</th><th>Lote</th><th>Pontuação</th></tr></thead>
                     <tbody id="history-table-body"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- ABA 3 -->
+    <!-- ABA 3: FECHAMENTO -->
     <div id="tab-fechamento" class="tab-content">
         <div class="card">
-            <div class="card-title">Fechamento Mensal Integrado</div>
+            <div class="card-title">Fechamento Mensal Accumulado</div>
             <div class="history-filters" style="grid-template-columns: 1fr;">
                 <div>
                     <label>Selecione o Mês</label>
@@ -162,26 +302,26 @@
             </div>
             <div style="overflow-x: auto;">
                 <table>
-                    <thead><tr><th>Data do Trabalho</th><th>Colaboradora</th><th>Pontuação Total Acumulada do Dia</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Data</th><th>Colaboradora</th><th>Pontuação Acumulada</th><th>Status</th></tr></thead>
                     <tbody id="fechamento-table-body"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- ABA 4 -->
+    <!-- ABA 4: SETORES -->
     <div id="tab-setores" class="tab-content">
         <div class="card">
-            <div class="card-title">Quantidades Brutas Produzidas por Setor / Serviço</div>
+            <div class="card-title">Quantidades Brutas por Setor</div>
             <div class="history-filters" style="grid-template-columns: 1fr;">
                 <div>
-                    <label>Selecione o Dia para Medir os Setores</label>
+                    <label>Selecione o Dia</label>
                     <input type="date" id="filter-sector-date" onchange="renderSectorTable()">
                 </div>
             </div>
             <div style="overflow-x: auto;">
                 <table>
-                    <thead><tr><th>Setor / Serviço</th><th>Colaboradora</th><th>Quantidade Bruta de Peças</th></tr></thead>
+                    <thead><tr><th>Setor / Serviço</th><th>Colaboradora</th><th>Peças Produzidas</th></tr></thead>
                     <tbody id="sector-table-body"></tbody>
                 </table>
             </div>
@@ -237,7 +377,7 @@
                     };
                 });
                 indicator.className = "sync-dot success";
-                text.innerText = "Sincronizado em tempo real";
+                text.innerText = "Sincronizado";
                 updateDashboard();
                 renderHistoryTable();
                 renderFechamentoTable();
@@ -252,7 +392,6 @@
         document.body.appendChild(script);
     }
 
-    // NOVA FUNÇÃO: Salvar os registros enviados do formulário para a planilha
     function salvarProducao() {
         const btnSave = document.getElementById('btn-save');
         const collab = document.getElementById('collab-select').value;
@@ -260,31 +399,27 @@
         const dataInput = document.getElementById('date-select').value;
 
         if (!dataInput) {
-            alert("Por favor, selecione a data do trabalho!");
+            alert("Selecione a data do trabalho!");
             return;
         }
 
         let totalPontos = calculateTotal();
         if (totalPontos <= 0) {
-            alert("Adicione a quantidade de pelo menos 1 serviço antes de salvar!");
+            alert("Preencha a quantidade de ao menos 1 serviço!");
             return;
         }
 
-        // Constrói o objeto JSON dos setores baseado no que foi preenchido
         let objSetores = {};
         servicos.forEach(s => {
             let qtd = parseInt(document.getElementById(`input-${s.id}`).value) || 0;
-            if (qtd > 0) {
-                objSetores[s.nome] = qtd;
-            }
+            if (qtd > 0) objSetores[s.nome] = qtd;
         });
 
         btnSave.disabled = true;
-        btnSave.innerText = "Salvando no Google Sheets...";
+        btnSave.innerText = "Gravando na Planilha...";
 
         const dataFormatada = converterInputParaPlanilha(dataInput);
 
-        // Envia via parâmetros de URL no método GET que o Apps Script aceita
         const urlParaSalvar = WEB_APP_URL + 
             `?action=inserir` +
             `&data=${encodeURIComponent(dataFormatada)}` +
@@ -297,16 +432,12 @@
         const callbackName = 'callback_save_' + Math.round(100000 * Math.random());
         window[callbackName] = function(response) {
             btnSave.disabled = false;
-            btnSave.innerText = "Salvar Registro";
-            
-            alert("Produção salva com sucesso!");
-            
-            // Limpa as quantidades do formulário
+            btnSave.innerText = "Salvar Produção";
+            alert("Registro salvo com sucesso na planilha!");
+
             servicos.forEach(s => { document.getElementById(`input-${s.id}`).value = 0; });
             document.getElementById('lote-input').value = "";
             calculateTotal();
-            
-            // Recarrega o dashboard
             carregarDadosDoDrive();
 
             document.body.removeChild(script);
@@ -319,10 +450,10 @@
     }
 
     function setInitialDates() {
-        // Define as datas iniciais padrão para a data atual (20, Julho de 2026)
-        document.getElementById('date-select').value = "2026-07-20";
-        document.getElementById('filter-date').value = "2026-07-20";
-        document.getElementById('filter-sector-date').value = "2026-07-20";
+        const hoje = "2026-07-21";
+        document.getElementById('date-select').value = hoje;
+        document.getElementById('filter-date').value = hoje;
+        document.getElementById('filter-sector-date').value = hoje;
         document.getElementById('filter-month').value = "2026-07";
     }
 
@@ -340,7 +471,7 @@
             const row = document.createElement('div');
             row.className = 'service-row';
             row.innerHTML = `
-                <div class="service-info">${servico.nome} (<span>${servico.preco.toFixed(2)} pts</span>)</div>
+                <div class="service-info"><span>${servico.nome}</span> <span>${servico.preco.toFixed(2)} pts</span></div>
                 <div class="input-counter">
                     <input type="number" id="input-${servico.id}" value="0" min="0" oninput="calculateTotal()" style="width: 70px; text-align: center;">
                     <button type="button" class="btn-quick" onclick="adjustValue('${servico.id}', 1)">+1</button>
@@ -375,14 +506,14 @@
                 .reduce((soma, item) => soma + item.pontos, 0);
 
             const porcentagem = Math.round((total / 292) * 100);
-            let cor = total >= 292 ? '#48bb78' : (total >= 262 ? '#ecc94b' : '#f56565');
+            let cor = total >= 292 ? 'var(--success-glow)' : (total >= 262 ? 'var(--warning-glow)' : 'var(--danger-glow)');
             let textoStatus = total >= 292 ? 'Meta Batida! 🔥' : 'Abaixo da Meta 📉';
 
             container.innerHTML += `
                 <div class="collaborator-status-card">
-                    <div class="collab-header"><strong>${collab}</strong> <span>${total.toFixed(2)} / 292.00 pts</span></div>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${Math.min(porcentagem, 100)}%; background-color: ${cor};"></div></div>
-                    <div style="font-size: 12px; text-align: right; font-weight: bold; color: ${cor}; margin-top: 4px;">${textoStatus} (${porcentagem}%)</div>
+                    <div class="collab-header"><span>${collab}</span> <span style="color: ${cor}">${total.toFixed(2)} / 292.00 pts</span></div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${Math.min(porcentagem, 100)}%; background: ${cor}; box-shadow: 0 0 10px ${cor};"></div></div>
+                    <div style="font-size: 12px; text-align: right; font-weight: bold; color: ${cor};">${textoStatus} (${porcentagem}%)</div>
                 </div>`;
         });
     }
@@ -398,12 +529,12 @@
         });
 
         if(filtrados.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="4">Nenhum lote encontrado para este dia.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="4" style="color: var(--text-muted);">Nenhum lote registrado para esta data.</td></tr>`;
             return;
         }
 
         filtrados.forEach(item => {
-            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td><span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-weight:bold;">${item.lote || 'Sem Lote'}</span></td><td>${item.pontos.toFixed(2)} pts</td></tr>`;
+            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td><span class="sector-badge">${item.lote || 'Sem Lote'}</span></td><td style="color: var(--primary-neon); font-weight: bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
         });
     }
 
@@ -427,13 +558,13 @@
 
         const lista = Object.values(mapaAgrupado);
         if(lista.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="4">Nenhuma produção acumulada neste mês.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="4" style="color: var(--text-muted);">Nenhum acumulado encontrado para este mês.</td></tr>`;
             return;
         }
 
         lista.forEach(item => {
             let badge = item.pontosTotal >= 292 ? `<span class="status-badge status-acima">Meta Batida 🔥</span>` : `<span class="status-badge status-abaixo">Abaixo 📉</span>`;
-            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color:#2b6cb0;">${item.pontosTotal.toFixed(2)} pts</td><td>${badge}</td></tr>`;
+            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${item.pontosTotal.toFixed(2)} pts</td><td>${badge}</td></tr>`;
         });
     }
 
@@ -444,7 +575,7 @@
 
         const registrosDoDia = historicoProducao.filter(item => item.data === fDateBR);
         if(registrosDoDia.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="3">Nenhuma quantidade registrada para esta data.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="3" style="color: var(--text-muted);">Nenhuma quantidade registrada para esta data.</td></tr>`;
             return;
         }
 
@@ -455,22 +586,18 @@
                 if (item.setoresJson && item.setoresJson.startsWith('{')) {
                     let objSetores = JSON.parse(item.setoresJson);
                     for (let [nomeDoSetor, qtdPecas] of Object.entries(objSetores)) {
-                        tBody.innerHTML += `<tr><td><span class="sector-badge">${nomeDoSetor}</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color:#2b6cb0;">${qtdPecas} peças</td></tr>`;
+                        tBody.innerHTML += `<tr><td><span class="sector-badge">${nomeDoSetor}</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${qtdPecas} peças</td></tr>`;
                         linhasRenderizadas++;
                     }
                 } else {
-                    tBody.innerHTML += `<tr><td><span class="sector-badge">Geral / Outros</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color:#2b6cb0;">${Math.round(item.pontos)} peças</td></tr>`;
+                    tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${Math.round(item.pontos)} peças</td></tr>`;
                     linhasRenderizadas++;
                 }
             } catch (e) {
-                tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color:#2b6cb0;">${Math.round(item.pontos)} peças</td></tr>`;
+                tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${Math.round(item.pontos)} peças</td></tr>`;
                 linhasRenderizadas++;
             }
         });
-        
-        if(linhasRenderizadas === 0) {
-            tBody.innerHTML = `<tr><td colspan="3">Nenhuma quantidade registrada para esta data.</td></tr>`;
-        }
     }
 
     window.onload = function() {
