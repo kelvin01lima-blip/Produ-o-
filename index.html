@@ -152,6 +152,7 @@
         .live-preview-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         .total-value { font-size: 36px; font-weight: 800; color: var(--primary-neon); text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
 
+        .btn-actions-container { display: flex; gap: 10px; }
         .btn-action {
             width: 100%;
             padding: 16px;
@@ -168,6 +169,39 @@
             transition: all 0.3s;
         }
         .btn-action:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(56, 189, 248, 0.6); }
+        .btn-action.btn-editing {
+            background: linear-gradient(135deg, var(--warning-glow), #d97706);
+            color: #000;
+            box-shadow: 0 4px 20px rgba(234, 179, 8, 0.4);
+        }
+        .btn-cancel {
+            display: none;
+            width: 30%;
+            padding: 16px;
+            background: rgba(244, 63, 94, 0.2);
+            color: var(--danger-glow);
+            border: 1px solid var(--danger-glow);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+        .btn-cancel:hover { background: var(--danger-glow); color: #fff; }
+
+        .btn-edit-row {
+            background: rgba(234, 179, 8, 0.15);
+            color: var(--warning-glow);
+            border: 1px solid var(--warning-glow);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn-edit-row:hover { background: var(--warning-glow); color: #000; }
 
         .collaborator-status-card {
             background: rgba(15, 23, 42, 0.5);
@@ -221,7 +255,7 @@
         <div class="grid-main">
             <div class="card">
                 <div class="card-title">
-                    <span>Registrar Produção</span>
+                    <span id="form-card-title">Registrar Produção</span>
                     <span style="font-size: 13px; color: var(--text-muted);">Meta: 292.00 pts</span>
                 </div>
                 <div class="form-group">
@@ -250,7 +284,10 @@
                     <div class="total-value" id="live-total">0,00 pts</div>
                 </div>
                 
-                <button class="btn-action" id="btn-save" onclick="salvarProducao()">Salvar Produção</button>
+                <div class="btn-actions-container">
+                    <button class="btn-action" id="btn-save" onclick="salvarProducao()">Salvar Produção</button>
+                    <button class="btn-cancel" id="btn-cancel-edit" onclick="cancelarEdicao()">Cancelar</button>
+                </div>
             </div>
 
             <div class="card">
@@ -283,7 +320,7 @@
             </div>
             <div style="overflow-x: auto;">
                 <table>
-                    <thead><tr><th>Data</th><th>Colaboradora</th><th>Lote</th><th>Pontuação</th></tr></thead>
+                    <thead><tr><th>Data</th><th>Colaboradora</th><th>Lote</th><th>Pontuação</th><th>Ação</th></tr></thead>
                     <tbody id="history-table-body"></tbody>
                 </table>
             </div>
@@ -351,11 +388,19 @@
     ];
     const colaboradoras = ["Brenda", "Leidiane", "Cintia", "Raquel", "Fabiana"];
     let historicoProducao = [];
+    let editIndex = null; // Guarda o índice do item sendo editado
 
     function converterInputParaPlanilha(htmlDate) {
         if (!htmlDate) return "";
         let p = htmlDate.split('-');
         return `${p[2]}/${p[1]}/${p[0]}`;
+    }
+
+    function converterPlanilhaParaInput(brDate) {
+        if (!brDate) return "";
+        let p = brDate.split('/');
+        if (p.length !== 3) return "";
+        return `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
     }
 
     function carregarDadosDoDrive() {
@@ -367,8 +412,9 @@
         const callbackName = 'callback_' + Math.round(100000 * Math.random());
         window[callbackName] = function(data) {
             if (Array.isArray(data)) {
-                historicoProducao = data.map(item => {
+                historicoProducao = data.map((item, index) => {
                     return {
+                        linhaIndex: index + 2, // Guarda o número exato da linha da planilha (linha 1 é cabeçalho)
                         data: String(item["Data"] || "").trim(),
                         collab: String(item["Colaborador"] || "").trim(),
                         pontos: parseFloat(item["Peças produzidas"]) || 0,
@@ -419,12 +465,13 @@
         });
 
         btnSave.disabled = true;
-        btnSave.innerText = "Gravando na Planilha...";
+        btnSave.innerText = editIndex !== null ? "Atualizando..." : "Gravando na Planilha...";
 
         const dataFormatada = converterInputParaPlanilha(dataInput);
+        const acao = editIndex !== null ? 'editar' : 'inserir';
 
-        const urlParaSalvar = WEB_APP_URL + 
-            `?action=inserir` +
+        let urlParaSalvar = WEB_APP_URL + 
+            `?action=${acao}` +
             `&data=${encodeURIComponent(dataFormatada)}` +
             `&colaborador=${encodeURIComponent(collab)}` +
             `&pontos=${encodeURIComponent(totalPontos.toFixed(2))}` +
@@ -432,15 +479,16 @@
             `&setores=${encodeURIComponent(JSON.stringify(objSetores))}` +
             `&lote=${encodeURIComponent(lote)}`;
 
+        if (editIndex !== null) {
+            urlParaSalvar += `&linhaIndex=${editIndex}`;
+        }
+
         const callbackName = 'callback_save_' + Math.round(100000 * Math.random());
         window[callbackName] = function(response) {
             btnSave.disabled = false;
-            btnSave.innerText = "Salvar Produção";
-            alert("Registro salvo com sucesso na planilha!");
+            alert(editIndex !== null ? "Lançamento atualizado com sucesso!" : "Registro salvo com sucesso na planilha!");
 
-            servicos.forEach(s => { document.getElementById(`input-${s.id}`).value = 0; });
-            document.getElementById('lote-input').value = "";
-            calculateTotal();
+            cancelarEdicao();
             carregarDadosDoDrive();
 
             if (document.getElementById(callbackName)) {
@@ -453,6 +501,59 @@
         script.id = callbackName;
         script.src = urlParaSalvar + '&callback=' + callbackName;
         document.body.appendChild(script);
+    }
+
+    function prepararEdicao(linhaIndex) {
+        const item = historicoProducao.find(i => i.linhaIndex === linhaIndex);
+        if (!item) return;
+
+        editIndex = linhaIndex;
+
+        // Preenche campos do formulário
+        document.getElementById('collab-select').value = item.collab;
+        document.getElementById('lote-input').value = item.lote;
+        document.getElementById('date-select').value = converterPlanilhaParaInput(item.data);
+
+        // Reseta os campos de serviços
+        servicos.forEach(s => { document.getElementById(`input-${s.id}`).value = 0; });
+
+        // Preenche as quantidades salvas dos serviços
+        try {
+            if (item.setoresJson && item.setoresJson.startsWith('{')) {
+                let objSetores = JSON.parse(item.setoresJson);
+                for (let [nomeSetor, qtd] of Object.entries(objSetores)) {
+                    let servObj = servicos.find(s => s.nome.toLowerCase() === nomeSetor.toLowerCase());
+                    if (servObj) {
+                        document.getElementById(`input-${servObj.id}`).value = qtd;
+                    }
+                }
+            }
+        } catch (e) {}
+
+        calculateTotal();
+
+        // Altera interface para Modo de Edição
+        document.getElementById('form-card-title').innerText = "Editar Lançamento ✏️";
+        const btnSave = document.getElementById('btn-save');
+        btnSave.innerText = "Atualizar Lançamento";
+        btnSave.classList.add('btn-editing');
+        document.getElementById('btn-cancel-edit').style.display = "block";
+
+        // Mudar para a aba de formulário se não estiver nela
+        switchTab('registro');
+    }
+
+    function cancelarEdicao() {
+        editIndex = null;
+        servicos.forEach(s => { document.getElementById(`input-${s.id}`).value = 0; });
+        document.getElementById('lote-input').value = "";
+        calculateTotal();
+
+        document.getElementById('form-card-title').innerText = "Registrar Produção";
+        const btnSave = document.getElementById('btn-save');
+        btnSave.innerText = "Salvar Produção";
+        btnSave.classList.remove('btn-editing');
+        document.getElementById('btn-cancel-edit').style.display = "none";
     }
 
     function setInitialDates() {
@@ -535,13 +636,19 @@
         });
 
         if(filtrados.length === 0) {
-            tBody.innerHTML = `<tr><td colspan="4" style="color: var(--text-muted);">Nenhum lote registrado para esta data.</td></tr>`;
+            tBody.innerHTML = `<tr><td colspan="5" style="color: var(--text-muted);">Nenhum lote registrado para esta data.</td></tr>`;
             return;
         }
 
         filtrados.forEach(item => {
             const numLote = item.lote ? item.lote : 'Sem Lote';
-            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td><span class="sector-badge">${numLote}</span></td><td style="color: var(--primary-neon); font-weight: bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
+            tBody.innerHTML += `<tr>
+                <td>${item.data}</td>
+                <td><strong>${item.collab}</strong></td>
+                <td><span class="sector-badge">${numLote}</span></td>
+                <td style="color: var(--primary-neon); font-weight: bold;">${item.pontos.toFixed(2)} pts</td>
+                <td><button class="btn-edit-row" onclick="prepararEdicao(${item.linhaIndex})">✏️ Editar</button></td>
+            </tr>`;
         });
     }
 
