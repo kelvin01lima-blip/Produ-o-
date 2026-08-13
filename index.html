@@ -3,71 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.O.S - Cyber Production System</title>
+    <title>S.O.S - Sistema de Produção</title>
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --primary-neon: #38bdf8;
-            --accent-purple: #818cf8;
-            --success-glow: #22c55e;
-            --warning-glow: #eab308;
-            --danger-glow: #f43f5e;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-body: #f1f5f9;
+            --header-bg: #181e29;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --primary-orange: #ff6b35;
+            --accent-blue: #2563eb;
+            --accent-yellow: #f59e0b;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: var(--bg-dark); color: var(--text-main); padding: 25px; background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 70%); min-height: 100vh; }
-        .container { max-width: 1300px; margin: 0 auto; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background: var(--bg-body); color: var(--text-dark); min-height: 100vh; padding-bottom: 40px; }
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
 
         header {
-            text-align: center;
+            background: var(--header-bg);
+            color: #ffffff;
+            padding: 22px 30px;
             margin-bottom: 30px;
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            padding: 25px;
-            border-radius: 16px;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        header h1 {
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 28px;
+        .header-brand { display: flex; align-items: center; gap: 15px; }
+        .logo-box {
+            background: #ffffff;
+            color: var(--header-bg);
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 14px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .header-titles h1 {
+            font-size: 24px;
             font-weight: 800;
             letter-spacing: 1px;
-            margin-bottom: 5px;
+            color: #ffffff;
         }
-        header p { color: var(--text-muted); font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
+        .header-titles p { color: var(--primary-orange); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
 
-        .nav-tabs { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .tabs-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .sync-info { font-size: 13px; color: #cbd5e1; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.08); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .sync-dot { width: 10px; height: 10px; border-radius: 50%; background: #94a3b8; }
+        .sync-dot.success { background: var(--success-green); box-shadow: 0 0 8px var(--success-green); }
+        .sync-dot.syncing { background: var(--accent-yellow); box-shadow: 0 0 8px var(--accent-yellow); animation: pulse 1s infinite alternate; }
+
+        .nav-tabs { display: flex; justify-content: flex-start; align-items: center; margin-bottom: 25px; gap: 10px; flex-wrap: wrap; }
         .tab-btn {
-            padding: 12px 22px;
-            background: rgba(30, 41, 59, 0.5);
+            padding: 10px 20px;
+            background: #ffffff;
             border: 1px solid var(--card-border);
-            border-radius: 10px;
-            font-weight: 600;
+            border-radius: 20px;
+            font-weight: 700;
             cursor: pointer;
             color: var(--text-muted);
             font-size: 13px;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
         .tab-btn.active {
-            background: linear-gradient(135deg, var(--primary-neon), var(--accent-purple));
+            background: var(--primary-orange);
             color: #fff;
-            border-color: transparent;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+            border-color: var(--primary-orange);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
         }
-        .tab-btn:hover:not(.active) { background: rgba(255, 255, 255, 0.05); color: #fff; }
-
-        .sync-info { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; background: var(--card-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--card-border); }
-        .sync-dot { width: 10px; height: 10px; border-radius: 50%; background: #64748b; }
-        .sync-dot.success { background: var(--success-glow); box-shadow: 0 0 10px var(--success-glow); }
-        .sync-dot.syncing { background: var(--warning-glow); box-shadow: 0 0 10px var(--warning-glow); animation: pulse 1s infinite alternate; }
+        .tab-btn:hover:not(.active) { background: #f8fafc; color: var(--text-dark); }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -77,177 +88,191 @@
 
         .card {
             background: var(--card-bg);
-            backdrop-filter: blur(16px);
             border-radius: 16px;
             padding: 25px;
             border: 1px solid var(--card-border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
             margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
         }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-orange), var(--accent-blue));
+        }
+
         .card-title {
-            font-size: 18px;
-            font-weight: 700;
+            font-size: 17px;
+            font-weight: 800;
             margin-bottom: 20px;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--card-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: #fff;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-group { margin-bottom: 18px; }
-        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         select, input {
             width: 100%;
             padding: 12px 15px;
-            background: rgba(15, 23, 42, 0.6);
+            background: #f8fafc;
             border: 1px solid var(--card-border);
-            border-radius: 8px;
-            font-size: 15px;
-            color: #fff;
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-dark);
             outline: none;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            font-weight: 600;
         }
-        select:focus, input:focus { border-color: var(--primary-neon); box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+        select:focus, input:focus { border-color: var(--accent-blue); background: #ffffff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
 
         .services-grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-height: 420px; overflow-y: auto; padding-right: 5px; margin-bottom: 20px; }
         @media (min-width: 600px) { .services-grid { grid-template-columns: 1fr 1fr; } }
 
         .service-row {
-            background: rgba(15, 23, 42, 0.4);
+            background: #f8fafc;
             padding: 12px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
-        .service-info { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #cbd5e1; display: flex; justify-content: space-between; }
-        .service-info span { color: var(--primary-neon); }
+        .service-info { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); display: flex; justify-content: space-between; }
+        .service-info span { color: var(--accent-blue); }
 
         .input-counter { display: flex; gap: 6px; }
         .btn-quick {
-            background: rgba(255, 255, 255, 0.1);
+            background: #e2e8f0;
             border: none;
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 12px;
             font-weight: bold;
-            color: #fff;
+            color: var(--text-dark);
             transition: 0.2s;
         }
-        .btn-quick:hover { background: var(--primary-neon); color: #000; }
+        .btn-quick:hover { background: var(--accent-blue); color: #fff; }
 
         .live-preview {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            padding: 20px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 18px;
             border-radius: 12px;
             margin-bottom: 20px;
             text-align: center;
-            box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.1);
         }
-        .live-preview-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .total-value { font-size: 36px; font-weight: 800; color: var(--primary-neon); text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+        .live-preview-label { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .total-value { font-size: 34px; font-weight: 900; color: var(--accent-blue); }
 
         .btn-actions-container { display: flex; gap: 10px; }
         .btn-action {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--primary-neon), var(--accent-purple));
+            padding: 15px;
+            background: var(--primary-orange);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 800;
             cursor: pointer;
             letter-spacing: 1px;
             text-transform: uppercase;
-            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
-            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+            transition: all 0.2s;
         }
-        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(56, 189, 248, 0.6); }
+        .btn-action:hover { background: #e05522; transform: translateY(-1px); }
         .btn-action.btn-editing {
-            background: linear-gradient(135deg, var(--warning-glow), #d97706);
+            background: var(--accent-yellow);
             color: #000;
-            box-shadow: 0 4px 20px rgba(234, 179, 8, 0.4);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
         .btn-cancel {
             display: none;
             width: 30%;
-            padding: 16px;
-            background: rgba(244, 63, 94, 0.2);
-            color: var(--danger-glow);
-            border: 1px solid var(--danger-glow);
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: bold;
+            padding: 15px;
+            background: #fee2e2;
+            color: var(--danger-red);
+            border: 1px solid var(--danger-red);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
             cursor: pointer;
             text-transform: uppercase;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
-        .btn-cancel:hover { background: var(--danger-glow); color: #fff; }
+        .btn-cancel:hover { background: var(--danger-red); color: #fff; }
 
         .btn-edit-row {
-            background: rgba(234, 179, 8, 0.15);
-            color: var(--warning-glow);
-            border: 1px solid var(--warning-glow);
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fde68a;
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 12px;
             font-weight: bold;
             transition: 0.2s;
         }
-        .btn-edit-row:hover { background: var(--warning-glow); color: #000; }
+        .btn-edit-row:hover { background: var(--accent-yellow); color: #000; }
 
         .collaborator-status-card {
-            background: rgba(15, 23, 42, 0.5);
+            background: #f8fafc;
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 14px;
         }
-        .collab-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; font-size: 15px; }
-        .progress-bar-bg { background: rgba(255, 255, 255, 0.05); height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 6px; }
+        .collab-header { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 10px; font-size: 14px; color: var(--text-dark); }
+        .progress-bar-bg { background: #e2e8f0; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 6px; }
         .progress-bar-fill { height: 100%; width: 0%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        .history-filters { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; background: rgba(15, 23, 42, 0.4); padding: 18px; border-radius: 12px; border: 1px solid var(--card-border); }
+        .history-filters { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; background: #f8fafc; padding: 18px; border-radius: 12px; border: 1px solid var(--card-border); }
         @media(min-width: 600px) { .history-filters { grid-template-columns: 1fr 1fr; } }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 14px; border-bottom: 1px solid var(--card-border); text-align: center; font-size: 14px; }
-        th { background: rgba(15, 23, 42, 0.6); color: var(--text-muted); text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        th, td { padding: 12px 14px; border-bottom: 1px solid var(--card-border); text-align: center; font-size: 13px; }
+        th { background: #f8fafc; color: var(--text-muted); text-transform: uppercase; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; }
 
-        .status-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
-        .status-acima { background: rgba(34, 197, 94, 0.2); color: var(--success-glow); border: 1px solid var(--success-glow); }
-        .status-abaixo { background: rgba(244, 63, 94, 0.2); color: var(--danger-glow); border: 1px solid var(--danger-glow); }
-        .sector-badge { background: rgba(56, 189, 248, 0.15); color: var(--primary-neon); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 11px; }
+        .status-acima { background: #dcfce7; color: #15803d; }
+        .status-abaixo { background: #fee2e2; color: #b91c1c; }
+        .sector-badge { background: #eff6ff; color: var(--accent-blue); padding: 4px 10px; border-radius: 8px; border: 1px solid #bfdbfe; font-weight: 700; }
 
         @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>S.O.S Soluções em Semijoias</h1>
-        <p>Acompanhamento e Registro de Desempenho Diário</p>
-    </header>
+<header>
+    <div class="header-brand">
+        <div class="logo-box">Clube<br>S.O.S</div>
+        <div class="header-titles">
+            <h1>S.O.S SOLUÇÕES</h1>
+            <p>Apoio Operacional em Semijoias</p>
+        </div>
+    </div>
+    <div class="sync-info">
+        <span id="sync-indicator" class="sync-dot"></span>
+        <span id="sync-text">Conectando...</span>
+    </div>
+</header>
 
+<div class="container">
     <div class="nav-tabs">
-        <div class="tabs-group">
-            <button class="tab-btn active" id="btn-tab-registro" onclick="switchTab('registro')">Lançar Produção</button>
-            <button class="tab-btn" id="btn-tab-historico" onclick="switchTab('historico')">Lotes Isolados</button>
-            <button class="tab-btn" id="btn-tab-fechamento" onclick="switchTab('fechamento')">Fechamento Mensal</button>
-            <button class="tab-btn" id="btn-tab-setores" onclick="switchTab('setores')">Produção por Setor 📊</button>
-        </div>
-        <div class="sync-info">
-            <span id="sync-indicator" class="sync-dot"></span>
-            <span id="sync-text">Conectando...</span>
-        </div>
+        <button class="tab-btn active" id="btn-tab-registro" onclick="switchTab('registro')">Lançar Produção</button>
+        <button class="tab-btn" id="btn-tab-historico" onclick="switchTab('historico')">Lotes Isolados</button>
+        <button class="tab-btn" id="btn-tab-fechamento" onclick="switchTab('fechamento')">Fechamento Mensal</button>
+        <button class="tab-btn" id="btn-tab-setores" onclick="switchTab('setores')">Produção por Setor 📊</button>
     </div>
 
     <!-- ABA 1: REGISTRO -->
@@ -256,7 +281,7 @@
             <div class="card">
                 <div class="card-title">
                     <span id="form-card-title">Registrar Produção</span>
-                    <span style="font-size: 13px; color: var(--text-muted);">Meta: 292.00 pts</span>
+                    <span style="font-size: 12px; color: var(--text-muted);">Meta: 292.00 pts</span>
                 </div>
                 <div class="form-group">
                     <label>Colaboradora</label>
@@ -388,7 +413,7 @@
     ];
     const colaboradoras = ["Brenda", "Leidiane", "Cintia", "Raquel", "Fabiana"];
     let historicoProducao = [];
-    let editIndex = null; // Guarda o índice do item sendo editado
+    let editIndex = null;
 
     function converterInputParaPlanilha(htmlDate) {
         if (!htmlDate) return "";
@@ -414,7 +439,7 @@
             if (Array.isArray(data)) {
                 historicoProducao = data.map((item, index) => {
                     return {
-                        linhaIndex: index + 2, // Guarda o número exato da linha da planilha (linha 1 é cabeçalho)
+                        linhaIndex: index + 2,
                         data: String(item["Data"] || "").trim(),
                         collab: String(item["Colaborador"] || "").trim(),
                         pontos: parseFloat(item["Peças produzidas"]) || 0,
@@ -509,15 +534,12 @@
 
         editIndex = linhaIndex;
 
-        // Preenche campos do formulário
         document.getElementById('collab-select').value = item.collab;
         document.getElementById('lote-input').value = item.lote;
         document.getElementById('date-select').value = converterPlanilhaParaInput(item.data);
 
-        // Reseta os campos de serviços
         servicos.forEach(s => { document.getElementById(`input-${s.id}`).value = 0; });
 
-        // Preenche as quantidades salvas dos serviços
         try {
             if (item.setoresJson && item.setoresJson.startsWith('{')) {
                 let objSetores = JSON.parse(item.setoresJson);
@@ -532,14 +554,12 @@
 
         calculateTotal();
 
-        // Altera interface para Modo de Edição
         document.getElementById('form-card-title').innerText = "Editar Lançamento ✏️";
         const btnSave = document.getElementById('btn-save');
         btnSave.innerText = "Atualizar Lançamento";
         btnSave.classList.add('btn-editing');
         document.getElementById('btn-cancel-edit').style.display = "block";
 
-        // Mudar para a aba de formulário se não estiver nela
         switchTab('registro');
     }
 
@@ -613,13 +633,13 @@
                 .reduce((soma, item) => soma + item.pontos, 0);
 
             const porcentagem = Math.round((total / 292) * 100);
-            let cor = total >= 292 ? 'var(--success-glow)' : (total >= 262 ? 'var(--warning-glow)' : 'var(--danger-glow)');
+            let cor = total >= 292 ? 'var(--success-green)' : (total >= 262 ? 'var(--accent-yellow)' : 'var(--danger-red)');
             let textoStatus = total >= 292 ? 'Meta Batida! 🔥' : 'Abaixo da Meta 📉';
 
             container.innerHTML += `
                 <div class="collaborator-status-card">
                     <div class="collab-header"><span>${collab}</span> <span style="color: ${cor}">${total.toFixed(2)} / 292.00 pts</span></div>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${Math.min(porcentagem, 100)}%; background: ${cor}; box-shadow: 0 0 10px ${cor};"></div></div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${Math.min(porcentagem, 100)}%; background: ${cor};"></div></div>
                     <div style="font-size: 12px; text-align: right; font-weight: bold; color: ${cor};">${textoStatus} (${porcentagem}%)</div>
                 </div>`;
         });
@@ -646,7 +666,7 @@
                 <td>${item.data}</td>
                 <td><strong>${item.collab}</strong></td>
                 <td><span class="sector-badge">${numLote}</span></td>
-                <td style="color: var(--primary-neon); font-weight: bold;">${item.pontos.toFixed(2)} pts</td>
+                <td style="color: var(--accent-blue); font-weight: bold;">${item.pontos.toFixed(2)} pts</td>
                 <td><button class="btn-edit-row" onclick="prepararEdicao(${item.linhaIndex})">✏️ Editar</button></td>
             </tr>`;
         });
@@ -678,7 +698,7 @@
 
         lista.forEach(item => {
             let badge = item.pontosTotal >= 292 ? `<span class="status-badge status-acima">Meta Batida 🔥</span>` : `<span class="status-badge status-abaixo">Abaixo 📉</span>`;
-            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${item.pontosTotal.toFixed(2)} pts</td><td>${badge}</td></tr>`;
+            tBody.innerHTML += `<tr><td>${item.data}</td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--accent-blue);">${item.pontosTotal.toFixed(2)} pts</td><td>${badge}</td></tr>`;
         });
     }
 
@@ -702,13 +722,13 @@
                         let precoUnit = servObj ? servObj.preco : 1.0;
                         let ptsSetor = (qtdPecas * precoUnit).toFixed(2);
 
-                        tBody.innerHTML += `<tr><td><span class="sector-badge">${nomeDoSetor}</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${qtdPecas} peças</td><td style="color: var(--success-glow); font-weight:bold;">${ptsSetor} pts</td></tr>`;
+                        tBody.innerHTML += `<tr><td><span class="sector-badge">${nomeDoSetor}</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--accent-blue);">${qtdPecas} peças</td><td style="color: var(--success-green); font-weight:bold;">${ptsSetor} pts</td></tr>`;
                     }
                 } else {
-                    tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${Math.round(item.pontos)} peças</td><td style="color: var(--success-glow); font-weight:bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
+                    tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--accent-blue);">${Math.round(item.pontos)} peças</td><td style="color: var(--success-green); font-weight:bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
                 }
             } catch (e) {
-                tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--primary-neon);">${Math.round(item.pontos)} peças</td><td style="color: var(--success-glow); font-weight:bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
+                tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--accent-blue);">${Math.round(item.pontos)} peças</td><td style="color: var(--success-green); font-weight:bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
             }
         });
     }
