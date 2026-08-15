@@ -243,6 +243,9 @@
         th, td { padding: 12px 14px; border-bottom: 1px solid var(--card-border); text-align: center; font-size: 13px; }
         th { background: #f8fafc; color: var(--text-muted); text-transform: uppercase; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; }
 
+        tfoot tr { background: #f0fdf4; border-top: 2px solid var(--success-green); }
+        tfoot td { font-size: 14px; font-weight: 800; color: var(--text-dark); padding: 14px; }
+
         .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 11px; }
         .status-acima { background: #dcfce7; color: #15803d; }
         .status-abaixo { background: #fee2e2; color: #b91c1c; }
@@ -385,6 +388,7 @@
                 <table>
                     <thead><tr><th>Setor / Serviço</th><th>Colaboradora</th><th>Peças Produzidas</th><th>Pontuação Gerada</th></tr></thead>
                     <tbody id="sector-table-body"></tbody>
+                    <tfoot id="sector-table-footer"></tfoot>
                 </table>
             </div>
         </div>
@@ -702,16 +706,23 @@
         });
     }
 
+    // ABA 4: RENDERIZA TABELA COM TOTAL DA EQUIPE NO RODAPÉ
     function renderSectorTable() {
         const tBody = document.getElementById('sector-table-body');
+        const tFoot = document.getElementById('sector-table-footer');
         tBody.innerHTML = '';
-        const fDateBR = converterInputParaPlanilha(document.getElementById('filter-sector-date').value);
+        tFoot.innerHTML = '';
 
+        const fDateBR = converterInputParaPlanilha(document.getElementById('filter-sector-date').value);
         const registrosDoDia = historicoProducao.filter(item => item.data === fDateBR);
+
         if(registrosDoDia.length === 0) {
             tBody.innerHTML = `<tr><td colspan="4" style="color: var(--text-muted);">Nenhuma quantidade registrada para esta data.</td></tr>`;
             return;
         }
+
+        let acumuladoPecas = 0;
+        let acumuladoPontos = 0;
 
         registrosDoDia.forEach(item => {
             try {
@@ -720,17 +731,50 @@
                     for (let [nomeDoSetor, qtdPecas] of Object.entries(objSetores)) {
                         let servObj = servicos.find(s => s.nome.toLowerCase() === nomeDoSetor.toLowerCase());
                         let precoUnit = servObj ? servObj.preco : 1.0;
-                        let ptsSetor = (qtdPecas * precoUnit).toFixed(2);
+                        let ptsSetor = qtdPecas * precoUnit;
 
-                        tBody.innerHTML += `<tr><td><span class="sector-badge">${nomeDoSetor}</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--accent-blue);">${qtdPecas} peças</td><td style="color: var(--success-green); font-weight:bold;">${ptsSetor} pts</td></tr>`;
+                        acumuladoPecas += qtdPecas;
+                        acumuladoPontos += ptsSetor;
+
+                        tBody.innerHTML += `<tr>
+                            <td><span class="sector-badge">${nomeDoSetor}</span></td>
+                            <td><strong>${item.collab}</strong></td>
+                            <td style="font-weight:bold; color: var(--accent-blue);">${qtdPecas} peças</td>
+                            <td style="color: var(--success-green); font-weight:bold;">${ptsSetor.toFixed(2)} pts</td>
+                        </tr>`;
                     }
                 } else {
-                    tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--accent-blue);">${Math.round(item.pontos)} peças</td><td style="color: var(--success-green); font-weight:bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
+                    let pecasAprox = Math.round(item.pontos);
+                    acumuladoPecas += pecasAprox;
+                    acumuladoPontos += item.pontos;
+
+                    tBody.innerHTML += `<tr>
+                        <td><span class="sector-badge">Geral</span></td>
+                        <td><strong>${item.collab}</strong></td>
+                        <td style="font-weight:bold; color: var(--accent-blue);">${pecasAprox} peças</td>
+                        <td style="color: var(--success-green); font-weight:bold;">${item.pontos.toFixed(2)} pts</td>
+                    </tr>`;
                 }
             } catch (e) {
-                tBody.innerHTML += `<tr><td><span class="sector-badge">Geral</span></td><td><strong>${item.collab}</strong></td><td style="font-weight:bold; color: var(--accent-blue);">${Math.round(item.pontos)} peças</td><td style="color: var(--success-green); font-weight:bold;">${item.pontos.toFixed(2)} pts</td></tr>`;
+                let pecasAprox = Math.round(item.pontos);
+                acumuladoPecas += pecasAprox;
+                acumuladoPontos += item.pontos;
+
+                tBody.innerHTML += `<tr>
+                    <td><span class="sector-badge">Geral</span></td>
+                    <td><strong>${item.collab}</strong></td>
+                    <td style="font-weight:bold; color: var(--accent-blue);">${pecasAprox} peças</td>
+                    <td style="color: var(--success-green); font-weight:bold;">${item.pontos.toFixed(2)} pts</td>
+                </tr>`;
             }
         });
+
+        // LINHA DE TOTAL DO DIA DA EQUIPE
+        tFoot.innerHTML = `<tr>
+            <td colspan="2" style="text-align: right; font-weight: 800; text-transform: uppercase;">TOTAL DA EQUIPE NO DIA:</td>
+            <td style="color: var(--accent-blue); font-weight: 900; font-size: 15px;">${acumuladoPecas} peças</td>
+            <td style="color: var(--success-green); font-weight: 900; font-size: 15px;">${acumuladoPontos.toFixed(2)} pts</td>
+        </tr>`;
     }
 
     window.onload = function() {
