@@ -276,6 +276,7 @@
         <button class="tab-btn" id="btn-tab-historico" onclick="switchTab('historico')">Lotes Isolados</button>
         <button class="tab-btn" id="btn-tab-fechamento" onclick="switchTab('fechamento')">Fechamento Mensal</button>
         <button class="tab-btn" id="btn-tab-setores" onclick="switchTab('setores')">Produção por Setor 📊</button>
+        <button class="tab-btn" id="btn-tab-media" onclick="switchTab('media')">Média por Serviço 📈</button>
     </div>
 
     <!-- ABA 1: REGISTRO -->
@@ -393,6 +394,45 @@
             </div>
         </div>
     </div>
+
+    <!-- ABA 5: MÉDIA POR SERVIÇO -->
+    <div id="tab-media" class="tab-content">
+        <div class="card">
+            <div class="card-title">Média de Produção Diária por Serviço</div>
+            <div class="history-filters" style="grid-template-columns: 1fr 1fr;">
+                <div>
+                    <label>Filtrar Colaboradora</label>
+                    <select id="filter-media-collab" onchange="renderMediaTable()">
+                        <option value="todos">Todas</option>
+                        <option value="Brenda">Brenda</option>
+                        <option value="Leidiane">Leidiane</option>
+                        <option value="Cintia">Cintia</option>
+                        <option value="Raquel">Raquel</option>
+                        <option value="Fabiana">Fabiana</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Filtrar Mês (Opcional - Deixe em branco para Geral)</label>
+                    <input type="month" id="filter-media-month" onchange="renderMediaTable()">
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Serviço / Setor</th>
+                            <th>Total de Peças</th>
+                            <th>Pontuação Total</th>
+                            <th>Dias Trabalhados</th>
+                            <th>Média Peças / Dia</th>
+                            <th>Média Pontos / Dia</th>
+                        </tr>
+                    </thead>
+                    <tbody id="media-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -457,6 +497,7 @@
                 renderHistoryTable();
                 renderFechamentoTable();
                 renderSectorTable();
+                renderMediaTable();
             }
             if (document.getElementById(callbackName)) {
                 document.body.removeChild(document.getElementById(callbackName));
@@ -775,6 +816,88 @@
             <td style="color: var(--accent-blue); font-weight: 900; font-size: 15px;">${acumuladoPecas} peças</td>
             <td style="color: var(--success-green); font-weight: 900; font-size: 15px;">${acumuladoPontos.toFixed(2)} pts</td>
         </tr>`;
+    }
+
+    // ABA 5: CALCULA A MÉDIA DE PRODUÇÃO DIÁRIA POR SERVIÇO
+    function renderMediaTable() {
+        const tBody = document.getElementById('media-table-body');
+        if (!tBody) return;
+        tBody.innerHTML = '';
+
+        const fCollab = document.getElementById('filter-media-collab').value;
+        const fMonth = document.getElementById('filter-media-month').value;
+
+        let chaveMesBR = "";
+        if (fMonth) {
+            let p = fMonth.split('-');
+            chaveMesBR = `/${p[1]}/${p[0]}`;
+        }
+
+        // Mapeia totais e conjunto de dias únicos por serviço
+        let estatisticas = {};
+        servicos.forEach(s => {
+            estatisticas[s.nome] = {
+                nome: s.nome,
+                preco: s.preco,
+                totalPecas: 0,
+                totalPontos: 0,
+                diasSet: new Set()
+            };
+        });
+
+        historicoProducao.forEach(item => {
+            if (fCollab !== 'todos' && item.collab.toLowerCase() !== fCollab.toLowerCase()) return;
+            if (chaveMesBR && !item.data.includes(chaveMesBR)) return;
+
+            try {
+                if (item.setoresJson && item.setoresJson.startsWith('{')) {
+                    let objSetores = JSON.parse(item.setoresJson);
+                    for (let [nomeDoSetor, qtdPecas] of Object.entries(objSetores)) {
+                        let servObj = servicos.find(s => s.nome.toLowerCase() === nomeDoSetor.toLowerCase());
+                        let nomeOficial = servObj ? servObj.nome : nomeDoSetor;
+                        let precoUnit = servObj ? servObj.preco : 1.0;
+
+                        if (!estatisticas[nomeOficial]) {
+                            estatisticas[nomeOficial] = {
+                                nome: nomeOficial,
+                                preco: precoUnit,
+                                totalPecas: 0,
+                                totalPontos: 0,
+                                diasSet: new Set()
+                            };
+                        }
+
+                        if (qtdPecas > 0) {
+                            estatisticas[nomeOficial].totalPecas += qtdPecas;
+                            estatisticas[nomeOficial].totalPontos += (qtdPecas * precoUnit);
+                            estatisticas[nomeOficial].diasSet.add(item.data);
+                        }
+                    }
+                }
+            } catch (e) {}
+        });
+
+        const servicosComProducao = Object.values(estatisticas).filter(est => est.totalPecas > 0);
+
+        if (servicosComProducao.length === 0) {
+            tBody.innerHTML = `<tr><td colspan="6" style="color: var(--text-muted);">Nenhum dado de produção encontrado para os filtros selecionados.</td></tr>`;
+            return;
+        }
+
+        servicosComProducao.forEach(est => {
+            let qtdDias = est.diasSet.size;
+            let mediaPecas = qtdDias > 0 ? (est.totalPecas / qtdDias) : 0;
+            let mediaPontos = qtdDias > 0 ? (est.totalPontos / qtdDias) : 0;
+
+            tBody.innerHTML += `<tr>
+                <td><span class="sector-badge">${est.nome}</span></td>
+                <td style="font-weight:bold; color: var(--text-dark);">${est.totalPecas} peças</td>
+                <td style="font-weight:bold; color: var(--success-green);">${est.totalPontos.toFixed(2)} pts</td>
+                <td><strong>${qtdDias} dia(s)</strong></td>
+                <td style="font-weight:900; color: var(--accent-blue);">${mediaPecas.toFixed(1)} peças/dia</td>
+                <td style="font-weight:900; color: var(--primary-orange);">${mediaPontos.toFixed(2)} pts/dia</td>
+            </tr>`;
+        });
     }
 
     window.onload = function() {
